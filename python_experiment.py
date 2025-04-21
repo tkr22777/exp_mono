@@ -6,13 +6,12 @@ A CLI application that processes text using a two-step approach:
 1. Create a plan based on the text
 2. Execute the plan with AI assistance
 """
-import json
 from typing import Optional
 
 import click
 
-from plan_creator import ProcessingPlan
-from text_processor import ProcessingResult, process_text
+from src.plan_creator import ProcessingPlan
+from src.text_processor import ProcessingResult, process_text
 
 
 def display_plan(plan: ProcessingPlan) -> None:
@@ -46,8 +45,7 @@ def display_results(results: ProcessingResult) -> None:
 @click.command()
 @click.option("--name", default="World", help="Who to greet")
 @click.option("--text", help="Text to process")
-@click.option("--verbose", is_flag=True, help="Show detailed output")
-def main(name: str, text: Optional[str], verbose: bool) -> int:
+def main(name: str, text: Optional[str]) -> int:
     """Process text using a two-step approach with AI assistance."""
     click.echo(f"Hello {name}!")
 
@@ -60,14 +58,6 @@ def main(name: str, text: Optional[str], verbose: bool) -> int:
         # Display the plan and results
         display_plan(plan)
         display_results(results)
-
-        # Show the full JSON output in verbose mode
-        if verbose:
-            click.echo("\n📋 DETAILED OUTPUT:")
-            click.echo("Plan:")
-            click.echo(json.dumps(plan.model_dump(), indent=2))
-            click.echo("\nResults:")
-            click.echo(json.dumps(results.model_dump(), indent=2))
 
     return 0
 

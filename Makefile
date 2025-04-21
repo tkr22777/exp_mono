@@ -1,125 +1,125 @@
-.PHONY: setup env check clean help run lint format type-check
+.PHONY: setup env check clean help run lint format type-check install test debug-keys
 
 # Variables
 PYTHON = python3
 TEXT ?= "This is some example text to process and analyze. It has multiple sentences! How many? Let's find out."
 NAME ?= "World"
-VERBOSE ?= 0
+SRC_DIR = src
+TEST_DIR = tests
 
 help:
 	@echo "Available commands:"
 	@echo "  make setup       - Install dependencies and create .env file"
+	@echo "  make install     - Install all dependencies"
 	@echo "  make env         - Create default .env file"
 	@echo "  make run         - Run the text processor with options:"
 	@echo "    TEXT=\"Your text\"                - Text to process (optional)"
 	@echo "    NAME=\"Your name\"                - Custom greeting name (optional)"
-	@echo "    VERBOSE=1                       - Show detailed output (optional)"
+	@echo "  make test        - Run all API tests using pytest"
+	@echo "  make debug-keys  - Display API keys in masked format for verification"
 	@echo "  make check       - Run all code quality checks (lint, format, type-check)"
 	@echo "  make clean       - Clean up generated files"
 
 # Setup the development environment and create env file
-setup:
-	@echo "Setting up Poetry environment..."
-	poetry install
-	@$(MAKE) env
+setup: install env
+
+# Install dependencies with Poetry
+install:
+	@echo "Installing dependencies..."
+	@if [ -f pyproject.toml ]; then \
+		if [ -f poetry.lock ]; then \
+			if ! poetry check --lock > /dev/null 2>&1; then \
+				poetry lock || echo "⚠️ Lock file update failed, continuing anyway"; \
+			fi; \
+		else \
+			poetry lock || echo "⚠️ Lock file generation failed, continuing anyway"; \
+		fi; \
+		poetry install || echo "❌ Installation failed"; \
+	else \
+		echo "❌ pyproject.toml not found"; \
+		exit 1; \
+	fi
 
 # Create environment file
 env:
-	@echo "Creating environment file..."
 	@if [ ! -f .env ]; then \
-		cp .env.example .env; \
-		echo "Created .env file. Please edit it to add your OpenAI API key."; \
+		cp .env.example .env && echo "Created .env file. Edit it to add your API keys."; \
 	else \
-		echo ".env file already exists."; \
+		echo ".env file already exists"; \
 	fi
 
 # Run the experiment
-run:
-	@echo "Running with environment file: .env"
-	@if [ ! -f .env ]; then \
-		echo "Environment file .env not found!"; \
-		echo "Creating default environment file..."; \
-		$(MAKE) env; \
-	fi
-	@echo "Processing text with AI..."
-	poetry run python python_experiment.py --name $(NAME) --text $(TEXT) $(if $(filter 1,$(VERBOSE)),--verbose,)
+run: install
+	@if [ ! -f .env ]; then $(MAKE) env; fi
+	@poetry run python python_experiment.py --name $(NAME) --text="$(TEXT)" || echo "❌ Execution failed"
+
+# Test all AI models
+test: install
+	@if [ ! -f .env ]; then $(MAKE) env; fi
+	@echo "Running API tests..."
+	@poetry run pytest $(TEST_DIR)/test_ai_models.py -v || echo "❌ Some tests failed or were skipped"
+
+# Debug API keys
+debug-keys: install
+	@if [ ! -f .env ]; then $(MAKE) env; fi
+	@echo "Displaying masked API keys for verification..."
+	@poetry run python -c "from tests.test_ai_models import print_config; print_config()"
 
 # Linting
 lint:
-	@echo "Running flake8..."
-	poetry run flake8 *.py
+	@poetry run flake8 $(SRC_DIR)/*.py $(TEST_DIR)/*.py *.py
 
 # Formatting
 format:
-	@echo "Formatting with isort and black..."
-	poetry run isort *.py
-	poetry run black *.py
+	@poetry run isort $(SRC_DIR) $(TEST_DIR) *.py && poetry run black $(SRC_DIR) $(TEST_DIR) *.py
 
 # Type checking
 type-check:
-	@echo "Running mypy..."
-	poetry run mypy *.py
+	@poetry run mypy $(SRC_DIR) $(TEST_DIR) *.py
 
 # Code quality checks (combines all checks)
 check:
-	@echo "Running all code quality checks..."
-	@echo "-------------------------------"
 	@failures=0; \
-	echo "Running flake8..."; \
-	poetry run flake8 *.py; \
+	echo "Running code quality checks..."; \
+	poetry run flake8 $(SRC_DIR)/*.py $(TEST_DIR)/*.py *.py; \
 	if [ $$? -ne 0 ]; then \
-		echo "❌ Flake8 check failed!"; \
+		echo "❌ Flake8"; \
 		failures=$$((failures+1)); \
 	else \
-		echo "✅ Flake8 check passed!"; \
+		echo "✅ Flake8"; \
 	fi; \
-	echo "-------------------------------"; \
-	echo "Running isort..."; \
-	poetry run isort --check-only *.py; \
+	poetry run isort --check-only $(SRC_DIR) $(TEST_DIR) *.py; \
 	if [ $$? -ne 0 ]; then \
-		echo "❌ isort check failed!"; \
+		echo "❌ isort"; \
 		failures=$$((failures+1)); \
 	else \
-		echo "✅ isort check passed!"; \
+		echo "✅ isort"; \
 	fi; \
-	echo "-------------------------------"; \
-	echo "Running black..."; \
-	poetry run black --check *.py; \
+	poetry run black --check $(SRC_DIR) $(TEST_DIR) *.py; \
 	if [ $$? -ne 0 ]; then \
-		echo "❌ black check failed!"; \
+		echo "❌ black"; \
 		failures=$$((failures+1)); \
 	else \
-		echo "✅ black check passed!"; \
+		echo "✅ black"; \
 	fi; \
-	echo "-------------------------------"; \
-	echo "Running mypy..."; \
-	poetry run mypy *.py; \
+	poetry run mypy $(SRC_DIR) $(TEST_DIR) *.py; \
 	if [ $$? -ne 0 ]; then \
-		echo "❌ Type check failed!"; \
+		echo "❌ mypy"; \
 		failures=$$((failures+1)); \
 	else \
-		echo "✅ Type check passed!"; \
+		echo "✅ mypy"; \
 	fi; \
-	echo "-------------------------------"; \
 	if [ $$failures -gt 0 ]; then \
-		echo "❌ Code quality checks: $$failures check(s) failed!"; \
+		echo "❌ $$failures check(s) failed"; \
 		exit 1; \
 	else \
-		echo "✅ All code quality checks passed!"; \
+		echo "✅ All checks passed"; \
 	fi
 
 # Automatically fix formatting issues
 fix-format:
-	@echo "Fixing formatting issues with isort and black..."
-	poetry run isort *.py
-	poetry run black *.py
-	@echo "✅ Formatting fixed!"
+	@poetry run isort $(SRC_DIR) $(TEST_DIR) *.py && poetry run black $(SRC_DIR) $(TEST_DIR) *.py && echo "✅ Formatting fixed"
 
 # Clean up
 clean:
-	@echo "Cleaning up..."
-	rm -rf __pycache__
-	rm -rf *.pyc
-	rm -rf .pytest_cache
-	rm -rf .coverage
-	rm -rf .mypy_cache 
+	@rm -rf __pycache__ $(SRC_DIR)/__pycache__ $(TEST_DIR)/__pycache__ *.pyc $(SRC_DIR)/*.pyc $(TEST_DIR)/*.pyc .pytest_cache .coverage .mypy_cache 
