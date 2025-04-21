@@ -1,4 +1,4 @@
-.PHONY: setup env check clean help run lint format type-check install test debug-keys
+.PHONY: setup env check clean help run lint format type-check install test
 
 # Variables
 PYTHON = python3
@@ -16,7 +16,6 @@ help:
 	@echo "    TEXT=\"Your text\"                - Text to process (optional)"
 	@echo "    NAME=\"Your name\"                - Custom greeting name (optional)"
 	@echo "  make test        - Run all API tests using pytest"
-	@echo "  make debug-keys  - Display API keys in masked format for verification"
 	@echo "  make check       - Run all code quality checks (lint, format, type-check)"
 	@echo "  make clean       - Clean up generated files"
 
@@ -58,12 +57,6 @@ test: install
 	@if [ ! -f .env ]; then $(MAKE) env; fi
 	@echo "Running API tests..."
 	@poetry run pytest $(TEST_DIR)/test_ai_models.py -v || echo "❌ Some tests failed or were skipped"
-
-# Debug API keys
-debug-keys: install
-	@if [ ! -f .env ]; then $(MAKE) env; fi
-	@echo "Displaying masked API keys for verification..."
-	@poetry run python -c "from tests.test_ai_models import print_config; print_config()"
 
 # Linting
 lint:

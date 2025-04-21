@@ -23,8 +23,8 @@ def create_plan(text: str) -> ProcessingPlan:
     Returns:
         A processing plan with minimal details
     """
-    # Extract a title from the text (first 5 words or less)
     words = text.split()
+    # Simple title extraction (first 5 words or less)
     title = " ".join(words[: min(5, len(words))]) + "..."
 
     plan = ProcessingPlan(

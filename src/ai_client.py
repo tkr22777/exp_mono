@@ -26,11 +26,9 @@ class AIClient:
         Args:
             api_key: OpenAI API key. If not provided, will use the one from settings.
         """
-        # Handle project API keys (starting with "sk-proj-")
         openai_key = api_key or settings.OPENAI_API_KEY
         openai_org = getattr(settings, "OPENAI_ORG", None)
         
-        # Initialize the OpenAI client with appropriate parameters
         if openai_key.startswith("sk-proj-"):
             if not openai_org:
                 print("Warning: Using a project API key but no organization ID is set. This may cause authentication issues.")
@@ -43,7 +41,6 @@ class AIClient:
             
         self.client = OpenAI(**client_args)
         
-        # Get model settings from application settings
         self.model_name = settings.MODEL_NAME
         self.max_tokens = settings.MAX_TOKENS
         self.temperature = settings.TEMPERATURE
@@ -70,7 +67,6 @@ class AIClient:
                 temperature=self.temperature,
             )
 
-            # Extract the response text
             if response.choices and len(response.choices) > 0:
                 return response.choices[0].message.content or ""
             return "No response generated."
@@ -98,31 +94,26 @@ class AIClient:
             )
 
         try:
-            # Reconfigure with the latest API key
             genai.configure(api_key=settings.GEMINI_API_KEY)
             
-            # Use a simpler approach without caching
             model = genai.GenerativeModel(settings.GEMINI_MODEL)
             
-            # Create generation config - handle different versions of the API
+            # Handle different versions of the Gemini API for generation config
             try:
                 generation_config = genai.types.GenerationConfig(
                     temperature=settings.GEMINI_TEMPERATURE,
                     max_output_tokens=250,
                 )
             except TypeError:
-                # Fall back to older API version
                 generation_config = genai.types.GenerationConfig(
                     temperature=settings.GEMINI_TEMPERATURE,
                 )
             
-            # Generate content
             response = model.generate_content(
                 input_data,
                 generation_config=generation_config
             )
             
-            # Return the response text
             return response.text
         except Exception as e:
             return f"Error generating Gemini response: {str(e)}"
@@ -172,5 +163,4 @@ class AIClient:
             return f"Error generating Deepseek response: {str(e)}"
 
 
-# Create a singleton instance
 default_client = AIClient()

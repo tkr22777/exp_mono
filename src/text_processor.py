@@ -46,10 +46,8 @@ def execute_plan(plan: ProcessingPlan, text: str) -> ProcessingResult:
     Returns:
         Results of the executed plan
     """
-    # Get AI response
     ai_response = get_ai_response(text)
 
-    # Create and return the results model
     results = ProcessingResult(
         title=plan.title,
         ai_response=ai_response,
@@ -70,10 +68,6 @@ def process_text(text: str) -> Tuple[ProcessingPlan, ProcessingResult]:
     Returns:
         The plan and results from processing
     """
-    # Step 1: Create a plan based on the text
     plan = create_plan(text)
-
-    # Step 2: Execute the plan
     results = execute_plan(plan, text)
-
     return plan, results

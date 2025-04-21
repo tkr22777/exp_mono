@@ -4,9 +4,8 @@ Settings Module
 This module provides a centralized place for all application settings
 using Pydantic for validation and type safety.
 """
-import os
 import sys
-from typing import Dict, Optional
+from typing import Optional
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -14,14 +13,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Application settings loaded from environment variables with validation."""
 
-    # Configuration for dotenv file loading
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )
 
-    # OpenAI Configuration
+    # --- OpenAI --- 
     OPENAI_API_KEY: str = Field(..., description="OpenAI API key")
     OPENAI_ORG: Optional[str] = Field(
         None, description="OpenAI organization ID (required for project API keys)"
@@ -32,7 +30,7 @@ class Settings(BaseSettings):
         0.7, description="Temperature for OpenAI response generation"
     )
 
-    # Google Gemini Configuration
+    # --- Google Gemini --- 
     GEMINI_API_KEY: Optional[str] = Field(
         None, description="Google Gemini API key (optional)"
     )
@@ -43,7 +41,7 @@ class Settings(BaseSettings):
         0.15, description="Temperature for Gemini response generation"
     )
 
-    # Deepseek Configuration
+    # --- Deepseek --- 
     DEEPSEEK_API_KEY: Optional[str] = Field(
         None, description="Deepseek API key (optional)"
     )
@@ -61,7 +59,7 @@ class Settings(BaseSettings):
             raise ValueError(f"Temperature must be between 0.0 and 1.0, got {v}")
         return v
 
-# Create a singleton instance of settings for import throughout the application
+# Singleton instance for the application
 try:
     settings = Settings()
 except Exception as e:

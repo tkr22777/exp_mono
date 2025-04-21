@@ -37,7 +37,6 @@ def display_results(results: ProcessingResult) -> None:
     click.echo(f"Title: {results.title}")
     click.echo(f"Status: {results.status}")
 
-    # Display AI response
     click.echo("\n🤖 AI RESPONSE:")
     click.echo(f"{results.ai_response}")
 
@@ -51,11 +50,7 @@ def main(name: str, text: Optional[str]) -> int:
 
     if text:
         click.echo("\nProcessing text...")
-
-        # Process text using the two-step approach
         plan, results = process_text(text)
-
-        # Display the plan and results
         display_plan(plan)
         display_results(results)
 
