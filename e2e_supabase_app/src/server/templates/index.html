@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Supabase App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container py-4">
+        <header class="pb-3 mb-4 border-bottom">
+            <h1 class="fw-bold">E2E Supabase App</h1>
+            <p class="lead">A message board application with Supabase integration</p>
+        </header>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Post a Message</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="message-form">
+                            <div class="mb-3">
+                                <label for="author" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="author" placeholder="Anonymous">
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea class="form-control" id="message" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Post Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Messages</h5>
+                        <button id="refresh-btn" class="btn btn-sm btn-outline-secondary">Refresh</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="messages-container">
+                            <p class="text-center text-muted">No messages yet. Be the first to post!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>API Documentation</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Available Endpoints:</h6>
+                        <ul>
+                            <li><code>GET /api/messages</code> - Get all messages</li>
+                            <li><code>GET /api/messages/:id</code> - Get a specific message</li>
+                            <li><code>POST /api/message</code> - Create a new message</li>
+                            <li><code>GET /api/health</code> - Health check endpoint</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer mt-5 text-center">
+            <p>E2E Supabase App &copy; 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load messages on page load
+            fetchMessages();
+            
+            // Setup form submission
+            const form = document.getElementById('message-form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                postMessage();
+            });
+            
+            // Setup refresh button
+            const refreshBtn = document.getElementById('refresh-btn');
+            refreshBtn.addEventListener('click', fetchMessages);
+        });
+        
+        function fetchMessages() {
+            fetch('/api/messages')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayMessages(data.messages);
+                    }
+                })
+                .catch(error => console.error('Error fetching messages:', error));
+        }
+        
+        function postMessage() {
+            const author = document.getElementById('author').value || 'Anonymous';
+            const message = document.getElementById('message').value;
+            
+            if (!message) return;
+            
+            fetch('/api/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: message,
+                    author: author
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('message').value = '';
+                    fetchMessages();
+                }
+            })
+            .catch(error => console.error('Error posting message:', error));
+        }
+        
+        function displayMessages(messages) {
+            const container = document.getElementById('messages-container');
+            
+            if (messages.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted">No messages yet. Be the first to post!</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            // Sort messages by ID (newest first)
+            messages.sort((a, b) => b.id - a.id);
+            
+            messages.forEach(message => {
+                const timestamp = new Date(message.timestamp).toLocaleString();
+                
+                const messageEl = document.createElement('div');
+                messageEl.className = 'message-item mb-3 p-3 border-bottom';
+                messageEl.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <strong>${message.author}</strong>
+                        <small class="text-muted">${timestamp}</small>
+                    </div>
+                    <p class="mb-0 mt-2">${message.text}</p>
+                `;
+                
+                container.appendChild(messageEl);
+            });
+        }
+    </script>
+</body>
+</html> 
