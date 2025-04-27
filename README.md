@@ -12,14 +12,17 @@ A CLI application that processes text using a multi-step approach with AI assist
 ## Setup
 
 1. Clone this repository
-2. Create a virtual environment:
+2. Install Poetry if you haven't already:
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   # macOS / Linux / WSL
+   curl -sSL https://install.python-poetry.org | python3 -
+   
+   # Windows PowerShell
+   (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
    ```
 3. Install the dependencies:
    ```bash
-   pip install -r requirements.txt
+   poetry install
    ```
 4. Create a `.env` file with your API keys:
    ```
@@ -36,7 +39,7 @@ A CLI application that processes text using a multi-step approach with AI assist
 Process text with the standard two-step approach:
 
 ```bash
-python python_experiment.py --text "Your text to process goes here"
+poetry run python python_experiment.py --text "Your text to process goes here"
 ```
 
 ### LangChain Decision Making
@@ -44,7 +47,7 @@ python python_experiment.py --text "Your text to process goes here"
 Use LangChain for multi-step decision making:
 
 ```bash
-python python_experiment.py --text "Your text to process goes here" --use-langchain
+poetry run python python_experiment.py --text "Your text to process goes here" --use-langchain
 ```
 
 ### Persistent Storage
@@ -52,7 +55,7 @@ python python_experiment.py --text "Your text to process goes here" --use-langch
 Save the decision chain to the database:
 
 ```bash
-python python_experiment.py --text "Your text to process goes here" --use-langchain --persist
+poetry run python python_experiment.py --text "Your text to process goes here" --use-langchain --persist
 ```
 
 ### View Recent Decision Chains
@@ -60,7 +63,7 @@ python python_experiment.py --text "Your text to process goes here" --use-langch
 List recently saved decision chains:
 
 ```bash
-python python_experiment.py --list-recent
+poetry run python python_experiment.py --list-recent
 ```
 
 ### Load a Specific Decision Chain
@@ -68,7 +71,7 @@ python python_experiment.py --list-recent
 Load and display a specific decision chain by ID:
 
 ```bash
-python python_experiment.py --chain-id "chain_id_here"
+poetry run python python_experiment.py --chain-id "chain_id_here"
 ```
 
 ## Project Structure
