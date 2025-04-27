@@ -154,12 +154,23 @@ def agent_with_mock_llm(mock_llm):
     # Create a minimal agent with mocked components
     agent = LangChainAgent(llm=mock_llm, verbose=False)
     
-    # Create a mock agent_executor as a simple dictionary with an invoke method
-    mock_agent_executor = {
-        "invoke": lambda input_data: {"output": mock_llm.invoke(input_data["input"])}
-    }
+    # Create a simple mock executor that directly uses the mock LLM
+    class MockSimpleLLMExecutor:
+        def __init__(self, llm):
+            self.llm = llm
+        
+        def invoke(self, input_data):
+            # Get the response from the mock LLM
+            response = self.llm.invoke(input_data.get("input", ""))
+            
+            # Handle case where response is an AIMessage or other message type
+            if hasattr(response, 'content'):
+                response = response.content
+                
+            # Return the output in the expected format
+            return {"output": response}
     
     # Replace the agent's executor with our mock
-    agent.agent = mock_agent_executor
+    agent.agent = MockSimpleLLMExecutor(mock_llm)
     
     return agent 

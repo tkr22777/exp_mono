@@ -1,4 +1,4 @@
-.PHONY: setup env check clean help run lint format type-check install test
+.PHONY: setup env check clean help run lint format type-check install test serve serve-dev
 
 # Variables
 PYTHON = python3
@@ -6,6 +6,9 @@ TEXT ?= "This is some example text to process and analyze. It has multiple sente
 NAME ?= "World"
 SRC_DIR = src
 TEST_DIR = tests
+PORT ?= 5000
+HOST ?= 0.0.0.0
+TIMEOUT ?= 300
 
 help:
 	@echo "Available commands:"
@@ -18,6 +21,13 @@ help:
 	@echo "  make test        - Run all API tests using pytest"
 	@echo "  make check       - Run all code quality checks (lint, format, type-check)"
 	@echo "  make clean       - Clean up generated files"
+	@echo "  make serve       - Run the web server in production mode"
+	@echo "    HOST=0.0.0.0                     - Host to bind to (optional)"
+	@echo "    PORT=5000                        - Port to bind to (optional)"
+	@echo "    TIMEOUT=300                      - Gunicorn worker timeout in seconds (optional)"
+	@echo "  make serve-dev   - Run the web server in development mode"
+	@echo "    HOST=0.0.0.0                     - Host to bind to (optional)"
+	@echo "    PORT=5000                        - Port to bind to (optional)"
 
 # Setup the development environment and create env file
 setup: install env
@@ -112,6 +122,18 @@ check:
 # Automatically fix formatting issues
 fix-format:
 	@poetry run isort $(SRC_DIR) $(TEST_DIR) *.py && poetry run black $(SRC_DIR) $(TEST_DIR) *.py && echo "✅ Formatting fixed"
+
+# Run the web server (production mode)
+serve: install
+	@if [ ! -f .env ]; then $(MAKE) env; fi
+	@echo "Starting web server on $(HOST):$(PORT) with timeout $(TIMEOUT)s..."
+	@poetry run gunicorn -b $(HOST):$(PORT) --timeout $(TIMEOUT) "src.server.app:create_app()" || echo "❌ Server failed to start"
+
+# Run the web server (development mode)
+serve-dev: install
+	@if [ ! -f .env ]; then $(MAKE) env; fi
+	@echo "Starting development web server on $(HOST):$(PORT)..."
+	@poetry run python server.py --host $(HOST) --port $(PORT) --debug || echo "❌ Server failed to start"
 
 # Clean up
 clean:

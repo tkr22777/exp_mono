@@ -61,6 +61,7 @@ class LangChainAgent:
         self,
         llm: Optional[BaseLanguageModel] = None,
         verbose: bool = False,
+        max_iterations: int = 3,
     ):
         """
         Initialize the LangChain decision-making agent.
@@ -68,6 +69,7 @@ class LangChainAgent:
         Args:
             llm: The language model to use (defaults to OpenAI model from settings)
             verbose: Whether to print verbose output during execution
+            max_iterations: Maximum number of iterations for the agent to run
         """
         # Use the provided LLM or create a new one based on settings
         self.llm = llm or ChatOpenAI(
@@ -76,6 +78,7 @@ class LangChainAgent:
             temperature=settings.TEMPERATURE,
         )
         self.verbose = verbose
+        self.max_iterations = max_iterations
         
         # Create a message history for the agent
         self.message_history = ChatMessageHistory()
@@ -86,22 +89,16 @@ class LangChainAgent:
         # Active decision chain
         self.active_chain: Optional[DecisionChain] = None
 
-    def _create_agent(self) -> AgentExecutor:
+    def _create_agent(self) -> Any:
         """
-        Create a React agent with tools for decision making.
+        Create a simple wrapper around the LLM instead of a React agent with tools.
         
         Returns:
-            An AgentExecutor instance
+            A simple object with an invoke method that calls the LLM
         """
-        # For simplicity, we're not using tools in this initial implementation
-        # This can be extended with custom tools in future versions
-        tools = []
-        
-        # Create a prompt template for the agent
+        # Create a simple prompt template for decision making
         prompt = PromptTemplate.from_template(
-            """You are a decision-making agent that helps with complex problems.
-            
-            {tools}
+            """You are a decision-making assistant that helps with complex problems.
             
             Context: {context}
             
@@ -111,25 +108,43 @@ class LangChainAgent:
             3. Evaluate options for each decision
             4. Make recommendations based on your analysis
             
+            Provide a detailed and thoughtful response that shows your reasoning process.
+            
             {chat_history}
             
             Human: {input}
-            {agent_scratchpad}
-            
-            Available tools: {tool_names}
             """
         )
         
-        # Create the agent
-        agent = create_react_agent(self.llm, tools, prompt)
+        # Create a runnable sequence (prompt | llm) instead of using LLMChain
+        runnable = prompt | self.llm
         
-        # Create the agent executor
-        return AgentExecutor(
-            agent=agent,
-            tools=tools,
-            verbose=self.verbose,
-            handle_parsing_errors=True,
-        )
+        # Create a wrapper that mimics the AgentExecutor interface but just uses the LLM
+        class SimpleLLMExecutor:
+            def __init__(self, runnable):
+                self.runnable = runnable
+                
+            def invoke(self, input_data):
+                # Extract the input and context from the input data
+                input_text = input_data.get("input", "")
+                context = input_data.get("context", "")
+                chat_history = input_data.get("chat_history", [])
+                
+                # Call the runnable with the input data
+                response = self.runnable.invoke({
+                    "input": input_text,
+                    "context": context,
+                    "chat_history": chat_history
+                })
+                
+                # Handle case where response is an AIMessage or other message type
+                if hasattr(response, 'content'):
+                    response = response.content
+                
+                # Return a dictionary with the output to match AgentExecutor interface
+                return {"output": response}
+        
+        return SimpleLLMExecutor(runnable)
 
     def create_decision_chain(self, context: str, title: Optional[str] = None) -> DecisionChain:
         """
@@ -229,53 +244,79 @@ class LangChainAgent:
         # Clear previous message history
         self.message_history.clear()
         
-        # Run the agent to get an initial analysis
-        if isinstance(self.agent, dict):
-            initial_result = self.agent["invoke"]({"input": text, "context": text})
-        else:
+        try:
+            # Run the LLM to get an initial analysis
             initial_result = self.agent.invoke(
-                {"input": text, "context": text, "chat_history": self.message_history.messages}
+                {
+                    "input": text, 
+                    "context": text, 
+                    "chat_history": self.message_history.messages
+                }
             )
-        
-        # Add the first step based on the agent's output
-        reasoning = "Initial analysis of the input text"
-        decision = initial_result["output"]
-        next_actions = ["Refine analysis", "Consider alternatives", "Prepare final decision"]
-        self.add_decision_step(reasoning, decision, next_actions)
-        
-        # Run a refinement step
-        refinement_prompt = f"Given your initial analysis: {decision}, what refinements or alternatives should be considered?"
-        if isinstance(self.agent, dict):
-            refinement_result = self.agent["invoke"]({"input": refinement_prompt, "context": text})
-        else:
+            
+            # Add the first step based on the LLM's output
+            reasoning = "Initial analysis of the input text"
+            decision = initial_result["output"]
+            next_actions = ["Refine analysis", "Consider alternatives", "Prepare final decision"]
+            self.add_decision_step(reasoning, decision, next_actions)
+            
+            # Run a refinement step
+            refinement_prompt = f"Given your initial analysis: {decision}, what refinements or alternatives should be considered?"
             refinement_result = self.agent.invoke(
-                {"input": refinement_prompt, "context": text, "chat_history": self.message_history.messages}
+                {
+                    "input": refinement_prompt, 
+                    "context": text, 
+                    "chat_history": self.message_history.messages
+                }
             )
-        
-        # Add the refinement step
-        reasoning = "Refinement of initial analysis"
-        decision = refinement_result["output"]
-        next_actions = ["Prepare final decision"]
-        self.add_decision_step(reasoning, decision, next_actions)
-        
-        # Generate the final decision
-        final_prompt = f"Based on your analysis and refinements, what is your final decision or recommendation regarding: {text}"
-        if isinstance(self.agent, dict):
-            final_result = self.agent["invoke"]({"input": final_prompt, "context": text})
-        else:
+            
+            # Add the refinement step
+            reasoning = "Refinement of initial analysis"
+            decision = refinement_result["output"]
+            next_actions = ["Prepare final decision"]
+            self.add_decision_step(reasoning, decision, next_actions)
+            
+            # Generate the final decision
+            final_prompt = f"Based on your analysis and refinements, what is your final decision or recommendation regarding: {text}"
             final_result = self.agent.invoke(
-                {"input": final_prompt, "context": text, "chat_history": self.message_history.messages}
+                {
+                    "input": final_prompt, 
+                    "context": text, 
+                    "chat_history": self.message_history.messages
+                }
             )
+            
+            # Complete the decision chain
+            return self.complete_decision_chain(final_result["output"])
         
-        # Complete the decision chain
-        return self.complete_decision_chain(final_result["output"])
+        except Exception as e:
+            # If there's an error during processing, complete the chain with the error message
+            if self.active_chain:
+                # Check if we have at least one step
+                if not self.active_chain.steps:
+                    # Add an error step if no steps exist
+                    self.add_decision_step(
+                        reasoning="Error occurred during processing",
+                        decision=f"Error: {str(e)}",
+                        next_actions=[]
+                    )
+                
+                # Complete the chain with the error
+                self.active_chain.status = "error"
+                return self.complete_decision_chain(f"Error occurred: {str(e)}")
+            else:
+                # Re-raise the exception if no chain was created
+                raise
 
 
-def create_agent() -> LangChainAgent:
+def create_agent(max_iterations: int = 3) -> LangChainAgent:
     """
     Create a LangChain agent with default settings.
+    
+    Args:
+        max_iterations: Maximum number of iterations for the agent to run
     
     Returns:
         A configured LangChainAgent instance
     """
-    return LangChainAgent(verbose=True) 
+    return LangChainAgent(verbose=True, max_iterations=max_iterations) 

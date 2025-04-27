@@ -8,6 +8,8 @@ A CLI application that processes text using a multi-step approach with AI assist
 - **LangChain Decision Making**: Multi-step reasoning and decision making using LangChain
 - **Persistent Storage**: Database storage of decision chains and intermediate steps
 - **CLI Interface**: Simple command-line interface for all functionalities
+- **Web Interface**: Browser-based interface for interacting with the LangChain agent
+- **RESTful API**: HTTP API for integrating with other applications
 
 ## Setup
 
@@ -74,9 +76,68 @@ Load and display a specific decision chain by ID:
 poetry run python python_experiment.py --chain-id "chain_id_here"
 ```
 
+## Web Server
+
+The project includes a web server that provides a browser-based interface and RESTful API for the LangChain agent.
+
+### Starting the Web Server
+
+Start the web server in development mode:
+
+```bash
+make serve-dev
+```
+
+Or in production mode with Gunicorn:
+
+```bash
+make serve
+```
+
+By default, the server runs on http://localhost:5000. You can specify a different host and port:
+
+```bash
+make serve-dev HOST=127.0.0.1 PORT=8080
+```
+
+### Using the Web Interface
+
+Open your browser and navigate to http://localhost:5000 to access the web interface.
+
+The interface provides:
+- Text processing form with LangChain integration
+- Decision chain history viewer
+- Detailed view of decision steps and reasoning
+
+### RESTful API
+
+The following API endpoints are available:
+
+#### Process Text
+```
+POST /api/process
+Content-Type: application/json
+
+{
+  "text": "Your text to process",
+  "persist": true  // Optional, default: false
+}
+```
+
+#### Get Recent Chains
+```
+GET /api/chains?limit=10  // limit is optional, default: 10
+```
+
+#### Get Chain Details
+```
+GET /api/chains/{chain_id}
+```
+
 ## Project Structure
 
 - `python_experiment.py`: Main CLI application
+- `server.py`: Web server entry point
 - `src/`: Source code directory
   - `text_processor.py`: Core text processing functionality
   - `planner/`: Planning functionality
@@ -88,6 +149,11 @@ poetry run python python_experiment.py --chain-id "chain_id_here"
       - `models.py`: SQLAlchemy database models
       - `database.py`: Database session management
       - `api.py`: API for persistence operations
+  - `server/`: Web server implementation
+    - `app.py`: Flask application
+    - `cli.py`: Command-line interface for the server
+    - `templates/`: HTML templates
+    - `static/`: Static assets (CSS, JS, images)
 
 ## LangChain Agent Module
 
