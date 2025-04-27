@@ -17,6 +17,11 @@ openai = "^1.4.0"
 python-dotenv = "^1.0.0"
 tenacity = "^8.2.2"  # Retry library for API calls
 google-generativeai = "0.3.2"  # Google's Gemini API with fixed version
+langchain = ">=0.0.267"
+langchain-openai = ">=0.0.2"
+langchain-community = ">=0.0.9"
+langchain-core = ">=0.0.9"
+sqlalchemy = "^2.0.23"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"
