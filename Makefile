@@ -56,11 +56,11 @@ run: install
 test: install
 	@if [ ! -f .env ]; then $(MAKE) env; fi
 	@echo "Running API tests..."
-	@poetry run pytest $(TEST_DIR)/test_ai_models.py -v || echo "❌ Some tests failed or were skipped"
+	@poetry run pytest $(TEST_DIR) -v || echo "❌ Some tests failed or were skipped"
 
 # Linting
 lint:
-	@poetry run flake8 $(SRC_DIR)/*.py $(TEST_DIR)/*.py *.py
+	@poetry run flake8 $(SRC_DIR) $(TEST_DIR) *.py
 
 # Formatting
 format:
@@ -74,7 +74,7 @@ type-check:
 check:
 	@failures=0; \
 	echo "Running code quality checks..."; \
-	poetry run flake8 $(SRC_DIR)/*.py $(TEST_DIR)/*.py *.py; \
+	poetry run flake8 $(SRC_DIR) $(TEST_DIR) *.py; \
 	if [ $$? -ne 0 ]; then \
 		echo "❌ Flake8"; \
 		failures=$$((failures+1)); \
@@ -115,4 +115,7 @@ fix-format:
 
 # Clean up
 clean:
-	@rm -rf __pycache__ $(SRC_DIR)/__pycache__ $(TEST_DIR)/__pycache__ *.pyc $(SRC_DIR)/*.pyc $(TEST_DIR)/*.pyc .pytest_cache .coverage .mypy_cache 
+	@rm -rf __pycache__ $(SRC_DIR)/__pycache__ $(TEST_DIR)/__pycache__ \
+		$(SRC_DIR)/**/__pycache__ $(TEST_DIR)/**/__pycache__ \
+		*.pyc $(SRC_DIR)/*.pyc $(TEST_DIR)/*.pyc $(SRC_DIR)/**/*.pyc $(TEST_DIR)/**/*.pyc \
+		.pytest_cache .coverage .mypy_cache 

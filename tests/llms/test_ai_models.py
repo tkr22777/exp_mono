@@ -9,8 +9,8 @@ import json
 import pytest
 from openai import OpenAI
 
-from src.ai_client import default_client
-from src.settings import settings
+from src.llms.ai_client import default_client
+from src.utils.settings import settings
 
 
 def mask_api_key(key: str) -> str:

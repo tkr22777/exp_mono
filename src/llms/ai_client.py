@@ -9,7 +9,7 @@ import google.generativeai as genai
 from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
-from src.settings import settings
+from src.utils.settings import settings
 
 # Initialize Gemini if API key is available
 if settings.GEMINI_API_KEY:

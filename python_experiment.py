@@ -10,7 +10,7 @@ from typing import Optional
 
 import click
 
-from src.plan_creator import ProcessingPlan
+from src.planner.plan_creator import ProcessingPlan
 from src.text_processor import ProcessingResult, process_text
 
 
