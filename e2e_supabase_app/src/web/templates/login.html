@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Supabase App - Login</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- Navigation -->
+        <nav class="flex justify-between items-center py-4">
+            <div>
+                <a href="/" class="text-2xl font-bold text-blue-600">E2E Supabase App</a>
+            </div>
+        </nav>
+
+        <!-- Login Section -->
+        <div class="my-12 flex justify-center">
+            <div class="w-full max-w-md">
+                <div class="bg-white rounded-lg shadow">
+                    <div class="border-b border-gray-200">
+                        <ul class="flex" id="auth-tabs" role="tablist">
+                            <li class="mr-1">
+                                <button class="inline-block py-4 px-6 text-blue-500 hover:text-blue-800 font-medium border-b-2 border-blue-500" id="login-tab" data-tab="login" type="button" role="tab">Login</button>
+                            </li>
+                            <li>
+                                <button class="inline-block py-4 px-6 text-gray-500 hover:text-blue-500 font-medium" id="register-tab" data-tab="register" type="button" role="tab">Register</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="p-6">
+                        <div id="auth-tabs-content">
+                            <!-- Login Form -->
+                            <div id="login" class="block" role="tabpanel">
+                                <form id="login-form">
+                                    <div class="mb-4">
+                                        <label for="login-email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                        <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="login-email" required>
+                                    </div>
+                                    <div class="mb-6">
+                                        <label for="login-password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                                        <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="login-password" required>
+                                    </div>
+                                    <div id="login-error" class="mb-4 text-red-500 text-sm hidden"></div>
+                                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Login</button>
+                                </form>
+                            </div>
+
+                            <!-- Register Form -->
+                            <div id="register" class="hidden" role="tabpanel">
+                                <form id="register-form">
+                                    <div class="mb-4">
+                                        <label for="register-email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                        <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="register-email" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="register-password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                                        <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="register-password" required>
+                                    </div>
+                                    <div class="mb-6">
+                                        <label for="register-confirm-password" class="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
+                                        <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="register-confirm-password" required>
+                                    </div>
+                                    <div id="register-error" class="mb-4 text-red-500 text-sm hidden"></div>
+                                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Register</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 text-center">
+                    <a href="/" class="text-blue-500 hover:text-blue-700">← Back to Home</a>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-500 text-sm py-6 border-t border-gray-200">
+            <p>E2E Supabase App &copy; 2023</p>
+        </footer>
+    </div>
+
+    <!-- Tab switching script -->
+    <script src="/static/js/tabs.js"></script>
+    
+    <!-- Authentication script -->
+    <script src="/static/js/auth.js"></script>
+</body>
+</html> 

@@ -3,419 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E2E Supabase App</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>E2E Supabase App - Home</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body>
-    <div class="container py-4">
-        <header class="pb-3 mb-4 border-bottom">
-            <h1 class="fw-bold">E2E Supabase App</h1>
-            <p class="lead">A message board application with Supabase integration</p>
-        </header>
-
-        <!-- Authentication Section -->
-        <div class="row mb-4" id="auth-section">
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <ul class="nav nav-tabs card-header-tabs" id="auth-tabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">Login</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">Register</button>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="card-body">
-                        <div class="tab-content" id="auth-tabs-content">
-                            <!-- Login Form -->
-                            <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
-                                <form id="login-form">
-                                    <div class="mb-3">
-                                        <label for="login-email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="login-email" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="login-password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="login-password" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Login</button>
-                                </form>
-                            </div>
-
-                            <!-- Register Form -->
-                            <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
-                                <form id="register-form">
-                                    <div class="mb-3">
-                                        <label for="register-email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="register-email" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="register-password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="register-password" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="register-confirm-password" class="form-label">Confirm Password</label>
-                                        <input type="password" class="form-control" id="register-confirm-password" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Register</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- Navigation -->
+        <nav class="flex justify-between items-center py-4">
+            <div>
+                <a href="/" class="text-2xl font-bold text-blue-600">E2E Supabase App</a>
             </div>
+            <div id="nav-auth-section">
+                <a href="/login" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Login</a>
+            </div>
+        </nav>
 
-            <!-- User Profile -->
-            <div class="col-md-6 mb-4" id="profile-section" style="display: none;">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5>Your Profile</h5>
-                        <button id="logout-btn" class="btn btn-sm btn-outline-danger">Logout</button>
-                    </div>
-                    <div class="card-body">
-                        <div id="profile-info">
-                            <p><strong>Email:</strong> <span id="profile-email"></span></p>
-                            <p><strong>User ID:</strong> <span id="profile-id"></span></p>
-                            <p><strong>Joined:</strong> <span id="profile-created"></span></p>
-                        </div>
-                    </div>
+        <!-- Hero Section -->
+        <div class="py-12">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to E2E Supabase App</h1>
+                <p class="text-xl text-gray-600 mb-8">A secure, end-to-end application with Flask and Supabase integration</p>
+                <div class="flex justify-center gap-4">
+                    <a href="/login" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg">Get Started</a>
+                    <a href="#features" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg text-lg">Learn More</a>
                 </div>
             </div>
         </div>
 
-        <!-- Message Board Section (only visible when logged in) -->
-        <div class="row" id="message-board" style="display: none;">
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Post a Message</h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="message-form">
-                            <div class="mb-3">
-                                <label for="message" class="form-label">Message</label>
-                                <textarea class="form-control" id="message" rows="3" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Post Message</button>
-                        </form>
-                    </div>
+        <!-- Features Section -->
+        <div id="features" class="py-12">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Key Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="text-blue-500 text-4xl mb-4">🔐</div>
+                    <h3 class="text-xl font-bold mb-2">Secure Authentication</h3>
+                    <p class="text-gray-600">User authentication via Supabase with secure session management</p>
                 </div>
-            </div>
-            
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5>Messages</h5>
-                        <button id="refresh-btn" class="btn btn-sm btn-outline-secondary">Refresh</button>
-                    </div>
-                    <div class="card-body">
-                        <div id="messages-container">
-                            <p class="text-center text-muted">No messages yet. Be the first to post!</p>
-                        </div>
-                    </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="text-blue-500 text-4xl mb-4">💾</div>
+                    <h3 class="text-xl font-bold mb-2">Data Storage</h3>
+                    <p class="text-gray-600">PostgreSQL database integration with Supabase</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="text-blue-500 text-4xl mb-4">🚀</div>
+                    <h3 class="text-xl font-bold mb-2">REST API</h3>
+                    <p class="text-gray-600">Comprehensive RESTful API endpoints for your application needs</p>
                 </div>
             </div>
         </div>
 
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>API Documentation</h5>
-                    </div>
-                    <div class="card-body">
-                        <h6>Available Endpoints:</h6>
-                        <ul>
-                            <li><code>GET /api/messages</code> - Get all messages</li>
-                            <li><code>GET /api/messages/:id</code> - Get a specific message</li>
-                            <li><code>POST /api/message</code> - Create a new message (requires authentication)</li>
-                            <li><code>DELETE /api/messages/:id</code> - Delete a message (requires authentication)</li>
-                            <li><code>GET /api/health</code> - Health check endpoint</li>
-                            <li><code>POST /auth/register</code> - Register a new user</li>
-                            <li><code>POST /auth/login</code> - Login a user</li>
-                            <li><code>POST /auth/logout</code> - Logout the current user</li>
-                            <li><code>GET /auth/profile</code> - Get the current user's profile</li>
-                        </ul>
-                    </div>
+        <!-- API Documentation Section -->
+        <div class="py-12">
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h5 class="text-lg font-semibold text-gray-700">API Documentation</h5>
+                </div>
+                <div class="p-6">
+                    <h6 class="font-medium text-gray-700 mb-4">Available Endpoints:</h6>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">POST /auth/register</code> - Register a new user</li>
+                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">POST /auth/login</code> - Login a user</li>
+                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">POST /auth/logout</code> - Logout the current user</li>
+                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">GET /auth/profile</code> - Get the current user's profile</li>
+                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">GET /api/health</code> - Health check endpoint</li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <footer class="footer mt-5 text-center">
+        <footer class="mt-12 text-center text-gray-500 text-sm py-6 border-t border-gray-200">
             <p>E2E Supabase App &copy; 2023</p>
         </footer>
     </div>
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // User state
-        let currentUser = null;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is already logged in
-            checkAuthStatus();
-            
-            // Set up authentication event listeners
-            document.getElementById('login-form').addEventListener('submit', handleLogin);
-            document.getElementById('register-form').addEventListener('submit', handleRegister);
-            document.getElementById('logout-btn').addEventListener('click', handleLogout);
-            
-            // Set up message board event listeners
-            document.getElementById('message-form').addEventListener('submit', postMessage);
-            document.getElementById('refresh-btn').addEventListener('click', fetchMessages);
-        });
-        
-        // Authentication Functions
-        function checkAuthStatus() {
-            fetch('/auth/profile', {
-                credentials: 'include'
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Not authenticated');
-            })
-            .then(data => {
-                if (data.success) {
-                    currentUser = data.user;
-                    updateUIForAuthenticatedUser();
-                    fetchMessages();
-                }
-            })
-            .catch(error => {
-                console.log('Not logged in:', error);
-                updateUIForUnauthenticatedUser();
-            });
-        }
-        
-        function handleLogin(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            fetch('/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                }),
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    currentUser = data.user;
-                    updateUIForAuthenticatedUser();
-                    fetchMessages();
-                    
-                    // Clear form
-                    document.getElementById('login-form').reset();
-                } else {
-                    alert(data.error || 'Login failed');
-                }
-            })
-            .catch(error => {
-                console.error('Login error:', error);
-                alert('Login failed. Please try again.');
-            });
-        }
-        
-        function handleRegister(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            const confirmPassword = document.getElementById('register-confirm-password').value;
-            
-            if (password !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
-            
-            fetch('/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                }),
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    currentUser = data.user;
-                    updateUIForAuthenticatedUser();
-                    fetchMessages();
-                    
-                    // Clear form
-                    document.getElementById('register-form').reset();
-                } else {
-                    alert(data.error || 'Registration failed');
-                }
-            })
-            .catch(error => {
-                console.error('Registration error:', error);
-                alert('Registration failed. Please try again.');
-            });
-        }
-        
-        function handleLogout() {
-            fetch('/auth/logout', {
-                method: 'POST',
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    currentUser = null;
-                    updateUIForUnauthenticatedUser();
-                } else {
-                    alert(data.error || 'Logout failed');
-                }
-            })
-            .catch(error => {
-                console.error('Logout error:', error);
-            });
-        }
-        
-        // UI Update Functions
-        function updateUIForAuthenticatedUser() {
-            // Hide auth forms, show profile and message board
-            document.getElementById('auth-section').style.display = 'none';
-            document.getElementById('profile-section').style.display = 'block';
-            document.getElementById('message-board').style.display = 'flex';
-            
-            // Update profile information
-            document.getElementById('profile-email').textContent = currentUser.email;
-            document.getElementById('profile-id').textContent = currentUser.id;
-            const createdDate = new Date(currentUser.created_at).toLocaleString();
-            document.getElementById('profile-created').textContent = createdDate;
-        }
-        
-        function updateUIForUnauthenticatedUser() {
-            // Show auth forms, hide profile and message board
-            document.getElementById('auth-section').style.display = 'flex';
-            document.getElementById('profile-section').style.display = 'none';
-            document.getElementById('message-board').style.display = 'none';
-        }
-        
-        // Message Functions
-        function fetchMessages() {
-            fetch('/api/messages')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        displayMessages(data.messages);
-                    }
-                })
-                .catch(error => console.error('Error fetching messages:', error));
-        }
-        
-        function postMessage(e) {
-            e.preventDefault();
-            
-            const message = document.getElementById('message').value;
-            
-            if (!message) return;
-            
-            fetch('/api/message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    text: message
-                }),
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('message').value = '';
-                    fetchMessages();
-                } else {
-                    alert(data.error || 'Failed to post message');
-                }
-            })
-            .catch(error => console.error('Error posting message:', error));
-        }
-        
-        function deleteMessage(messageId) {
-            if (!confirm('Are you sure you want to delete this message?')) {
-                return;
-            }
-            
-            fetch(`/api/messages/${messageId}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    fetchMessages();
-                } else {
-                    alert(data.error || 'Failed to delete message');
-                }
-            })
-            .catch(error => console.error('Error deleting message:', error));
-        }
-        
-        function displayMessages(messages) {
-            const container = document.getElementById('messages-container');
-            
-            if (!messages || messages.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted">No messages yet. Be the first to post!</p>';
-                return;
-            }
-            
-            container.innerHTML = '';
-            
-            messages.forEach(message => {
-                const timestamp = new Date(message.created_at).toLocaleString();
-                const isOwner = currentUser && currentUser.id === message.user_id;
-                
-                const messageEl = document.createElement('div');
-                messageEl.className = 'message-item mb-3 p-3 border-bottom';
-                
-                let deleteButton = '';
-                if (isOwner) {
-                    deleteButton = `<button class="btn btn-sm btn-danger delete-message" data-message-id="${message.id}">Delete</button>`;
-                }
-                
-                messageEl.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <strong>${message.author}</strong>
-                        <div>
-                            <small class="text-muted me-2">${timestamp}</small>
-                            ${deleteButton}
-                        </div>
-                    </div>
-                    <p class="mb-0 mt-2">${message.text}</p>
-                `;
-                
-                container.appendChild(messageEl);
-                
-                // Add event listener to delete button if it exists
-                if (isOwner) {
-                    messageEl.querySelector('.delete-message').addEventListener('click', function() {
-                        deleteMessage(message.id);
-                    });
-                }
-            });
-        }
-    </script>
+    <!-- Home page script -->
+    <script src="/static/js/home.js"></script>
 </body>
 </html> 
