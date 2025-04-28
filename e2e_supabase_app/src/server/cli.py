@@ -4,16 +4,9 @@ Command Line Interface for E2E Supabase App
 This module provides a CLI for running the web server.
 """
 import click
-import os
 import sys
-from dotenv import load_dotenv
 
-from .app import run_server, app
-
-
-# Load environment variables if .env file exists
-if os.path.exists(".env"):
-    load_dotenv()
+from .app import run_server
 
 
 @click.command()

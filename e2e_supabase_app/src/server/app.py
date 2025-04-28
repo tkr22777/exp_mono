@@ -1,78 +1,17 @@
 """
 Flask Application for E2E Supabase App
 
-This module defines a Flask application with basic routes and functionality.
+This module defines a Flask application with routes and Supabase integration.
 """
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, jsonify
 from flask_cors import CORS
-import os
 import datetime
 
-# Initialize Flask app
-app = Flask(
-    __name__, 
-    static_folder="static",
-    template_folder="templates"
-)
-
-# Enable CORS for all routes
-CORS(app)
-
-# Sample data for demonstration
-messages = []
-
-@app.route("/", methods=["GET"])
-def index():
-    """Serve the main HTML page."""
-    return render_template("index.html")
-
-@app.route("/api/message", methods=["POST"])
-def add_message():
-    """Add a new message to the list."""
-    data = request.json
-    
-    if not data or "text" not in data:
-        return jsonify({"error": "Message text is required"}), 400
-    
-    # Extract message text
-    text = data["text"]
-    author = data.get("author", "Anonymous")
-    
-    # Create message object
-    message = {
-        "id": len(messages) + 1,
-        "text": text,
-        "author": author,
-        "timestamp": datetime.datetime.now().isoformat()
-    }
-    
-    # Add to messages list
-    messages.append(message)
-    
-    return jsonify({"success": True, "message": message})
-
-@app.route("/api/messages", methods=["GET"])
-def get_messages():
-    """Get all messages."""
-    return jsonify({"success": True, "messages": messages})
-
-@app.route("/api/messages/<int:message_id>", methods=["GET"])
-def get_message(message_id):
-    """Get a specific message by ID."""
-    for message in messages:
-        if message["id"] == message_id:
-            return jsonify({"success": True, "message": message})
-    
-    return jsonify({"success": False, "error": "Message not found"}), 404
-
-@app.route("/api/health", methods=["GET"])
-def health_check():
-    """Health check endpoint."""
-    return jsonify({
-        "status": "healthy",
-        "timestamp": datetime.datetime.now().isoformat(),
-        "version": "1.0.0"
-    })
+# Import configuration and blueprints
+from ..config import settings
+from ..auth import auth_bp
+from ..messages import messages_bp
+from ..web import web_bp
 
 def create_app() -> Flask:
     """
@@ -81,6 +20,30 @@ def create_app() -> Flask:
     Returns:
         Configured Flask application
     """
+    # Initialize Flask app
+    app = Flask(__name__)
+    
+    # Configure the app using settings
+    app.config.update(settings.get_flask_config())
+    
+    # Enable CORS for all routes
+    CORS(app, supports_credentials=True)
+    
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(messages_bp)
+    app.register_blueprint(web_bp)
+    
+    # Add health check endpoint
+    @app.route("/api/health", methods=["GET"])
+    def health_check():
+        """Health check endpoint."""
+        return jsonify({
+            "status": "healthy",
+            "timestamp": datetime.datetime.now().isoformat(),
+            "version": "1.0.0"
+        })
+    
     return app
 
 def run_server(host: str = "0.0.0.0", port: int = 5000, debug: bool = False) -> None:
@@ -92,6 +55,7 @@ def run_server(host: str = "0.0.0.0", port: int = 5000, debug: bool = False) -> 
         port: Port to bind the server to
         debug: Whether to run in debug mode
     """
+    app = create_app()
     app.run(host=host, port=port, debug=debug)
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 """
-Web Server Module
+Server Package
 
-This module provides a Flask-based web server with RESTful APIs
-for an end-to-end application with Supabase integration.
+This package is responsible for creating and running the Flask application server.
 """ 
