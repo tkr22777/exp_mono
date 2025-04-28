@@ -31,9 +31,6 @@ PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=7)
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_DELTA = datetime.timedelta(days=1)
 
-# Messages database settings
-MESSAGES_TABLE = "messages"
-
 def get_flask_config():
     """
     Get Flask application configuration dictionary.

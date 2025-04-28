@@ -5,9 +5,9 @@ An end-to-end application with Flask and Supabase integration.
 ## Features
 
 - **User Authentication**: Sign up, login, and session management via Supabase Auth
-- **Message Board Interface**: Web interface for posting and viewing messages
-- **RESTful API**: JSON API for managing messages
-- **Data Persistence**: Store data in Supabase PostgreSQL database
+- **User Profiles**: View and manage user profile information
+- **RESTful API**: JSON API for authentication and user management
+- **Data Persistence**: Store user data in Supabase PostgreSQL database
 - **Responsive Design**: Works on desktop and mobile
 - **Command-line Interface**: Start the server with customizable settings
 - **Automated Tests**: Comprehensive test suite for API endpoints and UI
@@ -86,12 +86,6 @@ make test
 - `POST /auth/login` - Log in a user
 - `POST /auth/logout` - Log out the current user
 - `GET /auth/profile` - Get the current user's profile
-
-#### Messages
-- `GET /api/messages` - Get all messages
-- `GET /api/messages/:id` - Get a specific message
-- `POST /api/message` - Create a new message (requires authentication)
-- `DELETE /api/messages/:id` - Delete a message (requires authentication)
 - `GET /api/health` - Health check endpoint
 
 ## Project Structure
@@ -107,9 +101,6 @@ The application follows a modular structure with clear separation of concerns:
   - `auth/`: Authentication functionality
     - `services.py`: Business logic for authentication
     - `routes.py`: API endpoints for authentication
-  - `messages/`: Message functionality
-    - `services.py`: Business logic for message operations
-    - `routes.py`: API endpoints for messages
   - `utils/`: Shared utilities
     - `decorators.py`: Authentication decorators
   - `web/`: Web interface

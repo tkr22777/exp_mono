@@ -13,7 +13,6 @@ from pathlib import Path
 # Import configuration and blueprints
 from ..config import settings
 from ..auth import auth_bp
-from ..messages import messages_bp
 from ..web import web_bp
 
 # Configure logging
@@ -61,7 +60,6 @@ def create_app() -> Flask:
     
     # Register blueprints
     app.register_blueprint(auth_bp)
-    app.register_blueprint(messages_bp)
     app.register_blueprint(web_bp)
     
     # Add health check endpoint

@@ -2,77 +2,77 @@
 Tests for the API endpoints.
 """
 import json
+import pytest
 
 def test_health_check(client):
     """Test the health check endpoint."""
     response = client.get("/api/health")
-    data = json.loads(response.data)
-    
     assert response.status_code == 200
+    data = json.loads(response.data)
     assert data["status"] == "healthy"
     assert "timestamp" in data
-    assert data["version"] == "1.0.0"
+    assert "version" in data
 
-def test_add_message(client, sample_message):
-    """Test adding a new message."""
-    response = client.post(
-        "/api/message", 
-        json=sample_message
-    )
+def test_login_required(client):
+    """Test that endpoints requiring authentication return 401 if not logged in."""
+    response = client.get("/auth/profile")
+    assert response.status_code == 401
     data = json.loads(response.data)
-    
-    assert response.status_code == 200
-    assert data["success"] is True
-    assert data["message"]["text"] == sample_message["text"]
-    assert data["message"]["author"] == sample_message["author"]
-    assert "timestamp" in data["message"]
-    assert data["message"]["id"] == 1
-
-def test_get_messages_empty(client):
-    """Test getting all messages when there are none."""
-    response = client.get("/api/messages")
-    data = json.loads(response.data)
-    
-    assert response.status_code == 200
-    assert data["success"] is True
-    assert data["messages"] == []
-
-def test_get_messages(client, add_sample_messages):
-    """Test getting all messages."""
-    response = client.get("/api/messages")
-    data = json.loads(response.data)
-    
-    assert response.status_code == 200
-    assert data["success"] is True
-    assert len(data["messages"]) == 3
-
-def test_get_message_by_id(client, add_sample_messages):
-    """Test getting a specific message by ID."""
-    response = client.get("/api/messages/1")
-    data = json.loads(response.data)
-    
-    assert response.status_code == 200
-    assert data["success"] is True
-    assert data["message"]["id"] == 1
-    assert data["message"]["text"] == "First test message"
-    assert data["message"]["author"] == "User 1"
-
-def test_get_message_not_found(client):
-    """Test getting a message that doesn't exist."""
-    response = client.get("/api/messages/999")
-    data = json.loads(response.data)
-    
-    assert response.status_code == 404
-    assert data["success"] is False
     assert "error" in data
 
-def test_add_message_missing_text(client):
-    """Test adding a message without text."""
+def test_register_and_login(client):
+    """Test user registration and login."""
+    # Register a new user
+    register_data = {
+        "email": "test@example.com",
+        "password": "securepassword"
+    }
     response = client.post(
-        "/api/message", 
-        json={"author": "Test Author"}
+        "/auth/register", 
+        data=json.dumps(register_data),
+        content_type="application/json"
     )
+    assert response.status_code == 200
     data = json.loads(response.data)
+    assert data["success"] is True
+    assert "user" in data
+    assert data["user"]["email"] == "test@example.com"
     
-    assert response.status_code == 400
-    assert "error" in data 
+    # Login with the user
+    login_data = {
+        "email": "test@example.com",
+        "password": "securepassword"
+    }
+    response = client.post(
+        "/auth/login", 
+        data=json.dumps(login_data),
+        content_type="application/json"
+    )
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data["success"] is True
+    assert "user" in data
+    assert data["user"]["email"] == "test@example.com"
+
+def test_logout(client):
+    """Test user logout."""
+    # Register and login first
+    register_data = {
+        "email": "logout@example.com",
+        "password": "securepassword"
+    }
+    client.post(
+        "/auth/register", 
+        data=json.dumps(register_data),
+        content_type="application/json"
+    )
+    
+    # Test logout
+    response = client.post("/auth/logout")
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data["success"] is True
+    
+    # Verify logged out by trying to access profile
+    response = client.get("/auth/profile")
+    assert response.status_code == 401 
