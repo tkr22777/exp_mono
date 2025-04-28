@@ -14,6 +14,7 @@ from pathlib import Path
 from ..config import settings
 from ..auth import auth_bp
 from ..web import web_bp
+from ..profiles import profiles_bp
 
 # Configure logging
 logging.basicConfig(
@@ -61,6 +62,7 @@ def create_app() -> Flask:
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(web_bp)
+    app.register_blueprint(profiles_bp)
     
     # Add health check endpoint
     @app.route("/api/health", methods=["GET"])

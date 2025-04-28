@@ -62,13 +62,33 @@
                 </div>
                 <div class="p-6">
                     <h6 class="font-medium text-gray-700 mb-4">Available Endpoints:</h6>
-                    <ul class="space-y-2 text-gray-600">
-                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">POST /auth/register</code> - Register a new user</li>
-                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">POST /auth/login</code> - Login a user</li>
-                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">POST /auth/logout</code> - Logout the current user</li>
-                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">GET /auth/profile</code> - Get the current user's profile</li>
-                        <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">GET /api/health</code> - Health check endpoint</li>
-                    </ul>
+                    
+                    <div class="mb-6">
+                        <h6 class="font-medium text-gray-700 mb-2">Authentication:</h6>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">POST /auth/register</code> - Register a new user</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">POST /auth/login</code> - Login a user</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">POST /auth/logout</code> - Logout the current user</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">GET /auth/profile</code> - Get the current user's profile</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h6 class="font-medium text-gray-700 mb-2">User Profiles:</h6>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">GET /api/profiles/me</code> - Get your profile</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">PATCH /api/profiles/me</code> - Update your profile</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">PATCH /api/profiles/me/metadata</code> - Update your profile metadata</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">GET /api/profiles/:id</code> - Get a user's profile</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h6 class="font-medium text-gray-700 mb-2">System:</h6>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">GET /api/health</code> - Health check endpoint</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,0 +1,19 @@
+-- Supabase Seed File
+--
+-- This file is intentionally empty to avoid foreign key constraint errors during initial setup.
+-- 
+-- To add seed data, follow these guidelines:
+--
+-- 1. Create users via auth.users first:
+--    INSERT INTO auth.users (id, email) VALUES 
+--      ('00000000-0000-0000-0000-000000000001', 'test@example.com');
+--
+-- 2. Then create profile records that reference those users:
+--    INSERT INTO user_profiles (id, display_name, email, avatar_url, metadata)
+--    VALUES 
+--      ('00000000-0000-0000-0000-000000000001', 'Test User', 'test@example.com', 
+--       'https://i.pravatar.cc/150?u=test@example.com', 
+--       '{"bio": "Test account for development", "location": "Test City"}')
+--    ON CONFLICT (id) DO NOTHING;
+--
+-- Note: Always use the ON CONFLICT clause to prevent errors when running the seed multiple times.

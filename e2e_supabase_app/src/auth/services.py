@@ -40,18 +40,14 @@ def get_current_user(token):
         supabase_token = payload.get('supabase_token')
         
         if supabase_token:
-            # If we have a Supabase token, try to use it
             try:
                 supabase = get_supabase_client()
                 response = supabase.auth.get_user(supabase_token)
                 return response.user
             except Exception as auth_error:
                 logging.warning(f"Stored Supabase token is invalid: {auth_error}")
-                # Continue to fallback, don't return or raise here
         
-        # Fallback for development or when Supabase token is unavailable/invalid:
-        # Return a simple user object based on the JWT payload
-        logging.info(f"Using fallback user data from JWT payload for user_id: {user_id}")
+        # Fallback to JWT payload data
         return {
             'id': user_id,
             'email': payload.get('email'),
@@ -90,16 +86,12 @@ def register_user(email, password):
         supabase_token = None
         if session:
             supabase_token = session.access_token
-            logging.info(f"Retrieved Supabase token during registration for user: {user.email}")
-        else:
-            logging.warning(f"No Supabase session available after registration for user: {user.email}")
         
         # Create JWT token
         token = create_auth_token(user, supabase_token)
         
         return user, token
     except ValueError as e:
-        # Handle Supabase connection errors
         logging.error(f"Supabase connection error during registration: {e}")
         raise Exception(f"Registration service unavailable. Please try again later.")
     except Exception as e:
@@ -134,16 +126,12 @@ def login_user(email, password):
         supabase_token = None
         if session:
             supabase_token = session.access_token
-            logging.info(f"Retrieved Supabase token during login for user: {user.email}")
-        else:
-            logging.warning(f"No Supabase session available after login for user: {user.email}")
         
         # Create JWT token
         token = create_auth_token(user, supabase_token)
         
         return user, token
     except ValueError as e:
-        # Handle Supabase connection errors
         logging.error(f"Supabase connection error during login: {e}")
         raise Exception(f"Login service unavailable. Please try again later.")
     except Exception as e:
@@ -161,7 +149,6 @@ def logout_user():
         supabase = get_supabase_client()
         supabase.auth.sign_out()
     except ValueError as e:
-        # Handle Supabase connection errors
         logging.error(f"Supabase connection error during logout: {e}")
         raise Exception(f"Logout service unavailable. Please try again later.")
     except Exception as e:

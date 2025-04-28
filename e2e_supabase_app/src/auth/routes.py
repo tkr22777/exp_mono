@@ -89,10 +89,6 @@ def login():
         session['access_token'] = token
         session.modified = True  # Ensure the session is saved
         
-        if current_app.debug:
-            logging.info(f"Session after login: {dict(session)}")
-            logging.info(f"Session contains token: {'access_token' in session}")
-        
         # Get user data
         if isinstance(user, dict):
             user_data = {
@@ -151,10 +147,6 @@ def get_profile():
     """
     try:
         token = session.get('access_token')
-        if current_app.debug:
-            logging.info(f"Session in profile route: {dict(session)}")
-            logging.info(f"Getting profile with token: {token[:10]}..." if token else "No token")
-        
         user = services.get_current_user(token)
         
         if not user:
@@ -164,16 +156,14 @@ def get_profile():
                 'error': 'User not found'
             }), 404
         
-        # Check if user is a dict (our fallback) or a Supabase user object
+        # Get user data based on type
         if isinstance(user, dict):
-            logging.info(f"Using dictionary user data for profile")
             user_data = {
                 'id': user.get('id'),
                 'email': user.get('email'),
                 'created_at': user.get('created_at')
             }
         else:
-            logging.info(f"Using Supabase user object for profile")
             user_data = {
                 'id': user.id,
                 'email': user.email,

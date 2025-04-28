@@ -43,9 +43,41 @@ An end-to-end application with Flask and Supabase integration.
    SUPABASE_URL=https://your-project-id.supabase.co
    SUPABASE_KEY=your-anon-key
    SUPABASE_SERVICE_KEY=your-service-role-key
+   SUPABASE_PROJECT_ID=your-project-id
+   SUPABASE_DB_PASSWORD=your-database-password
    SECRET_KEY=your-secure-random-string
    ```
-6. Set up the database schema by running the SQL in `setup_supabase.sql` in your Supabase SQL Editor
+
+## Database Schema Setup
+
+You can set up the database schema using the Supabase CLI with our convenient Makefile commands:
+
+1. Login to Supabase:
+   ```bash
+   make supabase-login
+   ```
+
+2. Link your project:
+   ```bash
+   make supabase-link
+   ```
+
+3. Push migrations to your Supabase project:
+   ```bash
+   make supabase-push
+   ```
+
+4. Apply seed data (for development):
+   ```bash
+   make supabase-seed
+   ```
+
+5. Generate a new migration from database changes:
+   ```bash
+   make supabase-diff MIGRATION_NAME=feature_name
+   ```
+
+For more details on how migrations work in this project, see the [Supabase Migrations Documentation](supabase/README.md).
 
 ## Usage
 
@@ -88,9 +120,13 @@ make test
 - `GET /auth/profile` - Get the current user's profile
 - `GET /api/health` - Health check endpoint
 
-## Project Structure
+#### Profiles
+- `GET /api/profiles/me` - Get the current user's profile
+- `PATCH /api/profiles/me` - Update the current user's profile
+- `PATCH /api/profiles/me/metadata` - Update the current user's metadata
+- `GET /api/profiles/:id` - Get a specific user's profile
 
-The application follows a modular structure with clear separation of concerns:
+## Project Structure 
 
 - `server.py`: Main entry point
 - `src/`: Source code directory
@@ -114,7 +150,6 @@ The application follows a modular structure with clear separation of concerns:
   - `server/`: Tests for server functionality
     - `test_api.py`: Tests for API endpoints
     - `test_app.py`: Tests for core application functionality
-- `setup_supabase.sql`: SQL script for setting up Supabase database tables
 
 This structure provides several benefits:
 - **Separation of Concerns**: Business logic is separate from routing
