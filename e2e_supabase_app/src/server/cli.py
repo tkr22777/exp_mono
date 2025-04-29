@@ -3,8 +3,9 @@ Command Line Interface for E2E Supabase App
 
 This module provides a CLI for running the web server.
 """
-import click
 import sys
+
+import click
 
 from .app import run_server
 
@@ -16,7 +17,7 @@ from .app import run_server
 def main(host: str, port: int, debug: bool) -> None:
     """
     Run the web server.
-    
+
     Args:
         host: Host to bind the server to
         port: Port to bind the server to
@@ -24,10 +25,10 @@ def main(host: str, port: int, debug: bool) -> None:
     """
     # Notify the user
     click.echo(f"Starting server on {host}:{port}")
-    
+
     # Run the server
     run_server(host=host, port=port, debug=debug)
 
 
 if __name__ == "__main__":
-    main() 
+    main()

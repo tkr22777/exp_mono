@@ -65,16 +65,6 @@ install:
 		echo "❌ pyproject.toml not found"; exit 1; \
 	fi
 
-env:
-	@if [ ! -f .env ]; then \
-		echo "FLASK_APP=src.server.app:create_app()" > .env && \
-		echo "FLASK_ENV=development" >> .env && \
-		echo "FLASK_DEBUG=1" >> .env && \
-		echo "Created .env file."; \
-	else \
-		echo ".env file already exists"; \
-	fi
-
 lint:
 	@poetry run flake8 src *.py
 

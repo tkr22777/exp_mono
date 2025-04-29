@@ -4,8 +4,9 @@ Application Settings
 This module is responsible for loading and providing access to application settings.
 It loads environment variables and provides unified access to configuration values.
 """
-import os
 import datetime
+import os
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file with force override
@@ -31,10 +32,11 @@ PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=7)
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_DELTA = datetime.timedelta(days=1)
 
+
 def get_flask_config():
     """
     Get Flask application configuration dictionary.
-    
+
     Returns:
         dict: Flask configuration dictionary
     """
@@ -42,5 +44,5 @@ def get_flask_config():
         "SECRET_KEY": SECRET_KEY,
         "SESSION_TYPE": SESSION_TYPE,
         "SESSION_PERMANENT": SESSION_PERMANENT,
-        "PERMANENT_SESSION_LIFETIME": PERMANENT_SESSION_LIFETIME
-    } 
+        "PERMANENT_SESSION_LIFETIME": PERMANENT_SESSION_LIFETIME,
+    }

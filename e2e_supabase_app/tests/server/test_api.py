@@ -3,6 +3,7 @@ Tests for the API endpoints.
 """
 import json
 import pytest
+import time
 
 def test_health_check(client):
     """Test the health check endpoint."""
@@ -22,9 +23,12 @@ def test_login_required(client):
 
 def test_register_and_login(client):
     """Test user registration and login."""
+    # Generate unique email with timestamp to avoid conflicts
+    unique_email = f"test_{int(time.time())}@example.com"
+    
     # Register a new user
     register_data = {
-        "email": "test@example.com",
+        "email": unique_email,
         "password": "securepassword"
     }
     response = client.post(
@@ -36,11 +40,11 @@ def test_register_and_login(client):
     data = json.loads(response.data)
     assert data["success"] is True
     assert "user" in data
-    assert data["user"]["email"] == "test@example.com"
+    assert data["user"]["email"] == unique_email
     
     # Login with the user
     login_data = {
-        "email": "test@example.com",
+        "email": unique_email,
         "password": "securepassword"
     }
     response = client.post(
@@ -52,13 +56,13 @@ def test_register_and_login(client):
     data = json.loads(response.data)
     assert data["success"] is True
     assert "user" in data
-    assert data["user"]["email"] == "test@example.com"
+    assert data["user"]["email"] == unique_email
 
 def test_logout(client):
     """Test user logout."""
     # Register and login first
     register_data = {
-        "email": "logout@example.com",
+        "email": f"logout_{int(time.time())}@example.com",
         "password": "securepassword"
     }
     client.post(

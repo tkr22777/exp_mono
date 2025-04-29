@@ -8,8 +8,8 @@ def test_index_page(client):
     
     assert response.status_code == 200
     assert b"E2E Supabase App" in response.data
-    assert b"A message board application with Supabase integration" in response.data
-    assert b"Post a Message" in response.data
+    assert b"A secure, end-to-end application with Flask and Supabase integration" in response.data
+    assert b"Get Started" in response.data
 
 def test_app_configuration(app):
     """Test the app is configured correctly."""
