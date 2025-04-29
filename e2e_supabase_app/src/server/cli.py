@@ -3,7 +3,6 @@ Command Line Interface for E2E Supabase App
 
 This module provides a CLI for running the web server.
 """
-import sys
 
 import click
 

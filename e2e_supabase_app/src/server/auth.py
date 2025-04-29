@@ -8,7 +8,6 @@ from functools import wraps
 
 import jwt
 from flask import Blueprint, current_app, jsonify, request, session
-from werkzeug.security import generate_password_hash
 
 from .supabase_client import get_supabase_client
 

@@ -3,9 +3,8 @@ Web Routes
 
 This module defines routes for web pages and UI.
 """
-import os
 
-from flask import Blueprint, current_app, redirect, render_template, session, url_for
+from flask import Blueprint, redirect, render_template, session, url_for
 
 # Create a blueprint for web routes
 web_bp = Blueprint(

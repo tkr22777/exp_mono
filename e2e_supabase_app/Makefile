@@ -1,6 +1,6 @@
 # Define all phony targets
 .PHONY: setup env check clean help install format lint test serve serve-dev \
-	supabase-% # All supabase targets are marked as phony
+	supabase-% format-and-clean # All supabase targets are marked as phony
 
 # Variables
 PYTHON = python3
@@ -68,14 +68,17 @@ install:
 lint:
 	@poetry run flake8 src *.py
 
-format:
-	@poetry run isort src *.py && poetry run black src *.py
+format-and-clean:
+	@echo "Formatting code and removing unused imports..."
+	@poetry run isort src *.py tests
+	@poetry run black src *.py tests
+	@poetry run autoflake --remove-all-unused-imports --recursive --in-place --exclude="__init__.py" src tests
 
 test: install
 	@echo "Running tests..."
 	@poetry run pytest tests/ -v
 
-check: lint format
+check: lint format-and-clean
 
 # Server commands
 serve: install

@@ -5,7 +5,6 @@ This module defines a Flask application with routes and Supabase integration.
 """
 import datetime
 import logging
-import os
 from pathlib import Path
 
 from flask import Flask, jsonify, send_from_directory, session

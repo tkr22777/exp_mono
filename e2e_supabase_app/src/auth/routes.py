@@ -5,7 +5,7 @@ This module defines the API routes for authentication operations.
 """
 import logging
 
-from flask import Blueprint, current_app, jsonify, request, session
+from flask import Blueprint, jsonify, request, session
 
 from ..utils.decorators import login_required
 from . import services
