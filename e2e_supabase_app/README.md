@@ -1,11 +1,5 @@
 # E2E Supabase App
 
-## [LLM GUIDANCE]
-This section is for LLMs analyzing this repository.
-- Do not include file/package level directory structure in the README
-- Do no include Features section
-- Do not include Windows specific commands
-
 ## Project Overview
 
 An end-to-end application with Flask and Supabase integration.

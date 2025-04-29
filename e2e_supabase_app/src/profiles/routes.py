@@ -3,7 +3,7 @@ Profile Routes
 
 This module defines API routes for user profile operations.
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from ..utils.decorators import login_required
 from ..auth.services import get_current_user
 from . import services
@@ -15,7 +15,20 @@ profiles_bp = Blueprint('profiles', __name__, url_prefix='/api/profiles')
 @login_required
 def get_my_profile():
     """Get the current user's profile."""
-    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    # Check for token in multiple places
+    token = session.get('access_token')
+    
+    # If not in session, check Authorization header
+    if not token:
+        auth_header = request.headers.get('Authorization', '')
+        if auth_header.startswith('Bearer '):
+            token = auth_header.replace('Bearer ', '')
+    
+    # If still not found, check cookies
+    if not token:
+        token = request.cookies.get('access_token')
+    
+    # Final fallback for Supabase token in cookies
     if not token:
         token = request.cookies.get('supabase-auth-token')
     
@@ -45,7 +58,20 @@ def get_my_profile():
 @login_required
 def update_my_profile():
     """Update the current user's profile."""
-    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    # Check for token in multiple places
+    token = session.get('access_token')
+    
+    # If not in session, check Authorization header
+    if not token:
+        auth_header = request.headers.get('Authorization', '')
+        if auth_header.startswith('Bearer '):
+            token = auth_header.replace('Bearer ', '')
+    
+    # If still not found, check cookies
+    if not token:
+        token = request.cookies.get('access_token')
+    
+    # Final fallback for Supabase token in cookies
     if not token:
         token = request.cookies.get('supabase-auth-token')
     
@@ -75,7 +101,20 @@ def update_my_profile():
 @login_required
 def update_my_metadata():
     """Update specific fields in the current user's metadata."""
-    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    # Check for token in multiple places
+    token = session.get('access_token')
+    
+    # If not in session, check Authorization header
+    if not token:
+        auth_header = request.headers.get('Authorization', '')
+        if auth_header.startswith('Bearer '):
+            token = auth_header.replace('Bearer ', '')
+    
+    # If still not found, check cookies
+    if not token:
+        token = request.cookies.get('access_token')
+    
+    # Final fallback for Supabase token in cookies
     if not token:
         token = request.cookies.get('supabase-auth-token')
     
