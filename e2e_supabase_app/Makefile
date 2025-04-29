@@ -1,4 +1,4 @@
-.PHONY: setup env check clean help install format lint test serve serve-dev supabase-install supabase-login supabase-link supabase-push supabase-reset supabase-diff supabase-seed supabase-status supabase-start supabase-stop supabase-restart supabase-local-db supabase-new-migration
+.PHONY: setup env check clean help install format lint test serve serve-dev supabase-install supabase-login supabase-link supabase-push supabase-reset supabase-diff supabase-seed supabase-status supabase-start supabase-stop supabase-restart supabase-local-db supabase-new-migration supabase-init
 
 # Variables
 PYTHON = python3
@@ -30,6 +30,7 @@ help:
 	@echo ""
 	@echo "Supabase Commands:"
 	@echo "  make supabase-install   - Install Supabase CLI"
+	@echo "  make supabase-init      - Initialize Supabase project and configure config.toml"
 	@echo "  make supabase-login     - Login to Supabase CLI"
 	@echo "  make supabase-link      - Link local project to Supabase project"
 	@echo "  make supabase-push      - Push migrations to Supabase database"
@@ -205,3 +206,17 @@ supabase-new-migration:
 	echo "" >> $$filename && \
 	echo "-- Enter your SQL commands here" >> $$filename && \
 	echo "Created migration file: $$filename"
+
+# Initialize Supabase project
+supabase-init:
+	@echo "Initializing Supabase project..."
+	@supabase init
+	@if [ -f supabase/config.toml ] && [ ! -z "$(SUPABASE_PROJECT_ID)" ] && [ ! -z "$(SUPABASE_URL)" ]; then \
+		sed -i '' "s/your-project-id/$(SUPABASE_PROJECT_ID)/g" supabase/config.toml; \
+		sed -i '' "s|https://your-project-id.supabase.co|$(SUPABASE_URL)|g" supabase/config.toml; \
+		sed -i '' "s|db.your-project-id.supabase.co|db.$(SUPABASE_PROJECT_ID).supabase.co|g" supabase/config.toml; \
+		echo "Supabase project initialized successfully."; \
+		echo "Please update supabase/config.toml with your project details if needed."; \
+	else \
+		echo "Initialization complete. Please update supabase/config.toml manually."; \
+	fi
