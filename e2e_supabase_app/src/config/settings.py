@@ -8,8 +8,8 @@ import os
 import datetime
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file with force override
+load_dotenv(override=True)
 
 # Flask settings
 FLASK_APP = os.getenv("FLASK_APP", "src.server.app:create_app()")
