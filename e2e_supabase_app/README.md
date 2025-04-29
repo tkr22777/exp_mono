@@ -1,16 +1,14 @@
 # E2E Supabase App
 
+## [LLM GUIDANCE]
+This section is for LLMs analyzing this repository.
+- Do not include file/package level directory structure in the README
+- Do no include Features section
+- Do not include Windows specific commands
+
+## Project Overview
+
 An end-to-end application with Flask and Supabase integration.
-
-## Features
-
-- **User Authentication**: Sign up, login, and session management via Supabase Auth
-- **User Profiles**: View and manage user profile information
-- **RESTful API**: JSON API for authentication and user management
-- **Data Persistence**: Store user data in Supabase PostgreSQL database
-- **Responsive Design**: Works on desktop and mobile
-- **Command-line Interface**: Start the server with customizable settings
-- **Automated Tests**: Comprehensive test suite for API endpoints and UI
 
 ## Setup
 
@@ -19,9 +17,6 @@ An end-to-end application with Flask and Supabase integration.
    ```bash
    # macOS / Linux / WSL
    curl -sSL https://install.python-poetry.org | python3 -
-   
-   # Windows PowerShell
-   (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
    ```
 3. Install the dependencies:
    ```bash
@@ -127,36 +122,8 @@ make test
 - `GET /api/profiles/:id` - Get a specific user's profile
 
 ## Project Structure 
-
-- `server.py`: Main entry point
-- `src/`: Source code directory
-  - `config/`: Configuration settings
-    - `settings.py`: Environment variables and configuration
-  - `db/`: Database connections and operations
-    - `supabase_client.py`: Supabase client with lazy loading
-  - `auth/`: Authentication functionality
-    - `services.py`: Business logic for authentication
-    - `routes.py`: API endpoints for authentication
-  - `utils/`: Shared utilities
-    - `decorators.py`: Authentication decorators
-  - `web/`: Web interface
-    - `routes.py`: Web routes for UI
-    - `templates/`: HTML templates
-    - `static/`: Static assets
-  - `server/`: Server core
-    - `app.py`: Flask application factory
-    - `cli.py`: Command-line interface
-- `tests/`: Test suite
-  - `server/`: Tests for server functionality
-    - `test_api.py`: Tests for API endpoints
-    - `test_app.py`: Tests for core application functionality
-
-This structure provides several benefits:
-- **Separation of Concerns**: Business logic is separate from routing
-- **Lazy Loading**: Resources are loaded only when needed
-- **Modularity**: Easy to add new features or modify existing ones
-- **Testability**: Components can be tested in isolation
-- **Error Handling**: Robust error handling throughout the codebase
+[LLM GUIDANCE] 
+- Please keep this empty
 
 ## Development
 
