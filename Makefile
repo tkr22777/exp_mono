@@ -1,9 +1,9 @@
-.PHONY: setup env check clean help run lint format type-check install test serve serve-dev
+.PHONY: setup check clean help run lint format type-check install test serve serve-dev
 
 # Variables
 PYTHON = python3
-TEXT ?= "This is some example text to process and analyze. It has multiple sentences! How many? Let's find out."
-NAME ?= "World"
+TEXT ?= This is some example text to process and analyze. It has multiple sentences! How many? Let's find out.
+NAME ?= World
 SRC_DIR = src
 TEST_DIR = tests
 PORT ?= 5000
@@ -12,9 +12,8 @@ TIMEOUT ?= 300
 
 help:
 	@echo "Available commands:"
-	@echo "  make setup       - Install dependencies and create .env file"
+	@echo "  make setup       - Install dependencies"
 	@echo "  make install     - Install all dependencies"
-	@echo "  make env         - Create default .env file"
 	@echo "  make run         - Run the text processor with options:"
 	@echo "    TEXT=\"Your text\"                - Text to process (optional)"
 	@echo "    NAME=\"Your name\"                - Custom greeting name (optional)"
@@ -29,8 +28,8 @@ help:
 	@echo "    HOST=0.0.0.0                     - Host to bind to (optional)"
 	@echo "    PORT=5000                        - Port to bind to (optional)"
 
-# Setup the development environment and create env file
-setup: install env
+# Setup the development environment
+setup: install
 
 # Install dependencies with Poetry
 install:
@@ -49,22 +48,12 @@ install:
 		exit 1; \
 	fi
 
-# Create environment file
-env:
-	@if [ ! -f .env ]; then \
-		cp .env.example .env && echo "Created .env file. Edit it to add your API keys."; \
-	else \
-		echo ".env file already exists"; \
-	fi
-
 # Run the experiment
 run: install
-	@if [ ! -f .env ]; then $(MAKE) env; fi
-	@poetry run python python_experiment.py --name $(NAME) --text="$(TEXT)" || echo "❌ Execution failed"
+	@poetry run python python_experiment.py --name "$(NAME)" --text "$(TEXT)" || echo "❌ Execution failed"
 
 # Test all AI models
 test: install
-	@if [ ! -f .env ]; then $(MAKE) env; fi
 	@echo "Running API tests..."
 	@poetry run pytest $(TEST_DIR) -v || echo "❌ Some tests failed or were skipped"
 
@@ -125,13 +114,11 @@ fix-format:
 
 # Run the web server (production mode)
 serve: install
-	@if [ ! -f .env ]; then $(MAKE) env; fi
 	@echo "Starting web server on $(HOST):$(PORT) with timeout $(TIMEOUT)s..."
 	@poetry run gunicorn -b $(HOST):$(PORT) --timeout $(TIMEOUT) "src.server.app:create_app()" || echo "❌ Server failed to start"
 
 # Run the web server (development mode)
 serve-dev: install
-	@if [ ! -f .env ]; then $(MAKE) env; fi
 	@echo "Starting development web server on $(HOST):$(PORT)..."
 	@poetry run python server.py --host $(HOST) --port $(PORT) --debug || echo "❌ Server failed to start"
 

@@ -61,7 +61,7 @@ class LangChainAgent:
         self,
         llm: Optional[BaseLanguageModel] = None,
         verbose: bool = False,
-        max_iterations: int = 3,
+        max_iterations: int = 5,
     ):
         """
         Initialize the LangChain decision-making agent.

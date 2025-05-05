@@ -3,352 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangChain Decision Agent</title>
+    <title>Experimental Project Hub</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="/static/css/style.css" rel="stylesheet">
     <style>
-        .decision-step {
+        .experiment-card {
             margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .experiment-card:hover {
+            transform: translateY(-5px);
+        }
+        .instruction-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        code {
+            background-color: #e9ecef;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre {
+            background-color: #e9ecef;
             padding: 15px;
             border-radius: 5px;
-            background-color: #f8f9fa;
-        }
-        .step-header {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .next-action {
-            margin-top: 5px;
-            font-style: italic;
-        }
-        .loading {
-            display: none;
+            overflow-x: auto;
         }
     </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">LangChain Decision Agent</h1>
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4">Experimental Project Hub</h1>
+                <p class="lead">Welcome to the experimental project hub. This is a central landing page for various web experiments and prototypes.</p>
+                <hr class="my-4">
+            </div>
+        </div>
         
-        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="process-tab" data-bs-toggle="tab" data-bs-target="#process" type="button" role="tab" aria-controls="process" aria-selected="true">Process Text</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">Decision History</button>
-            </li>
-        </ul>
-        
-        <div class="tab-content" id="myTabContent">
-            <!-- Process Tab -->
-            <div class="tab-pane fade show active" id="process" role="tabpanel" aria-labelledby="process-tab">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Process Text</h5>
-                        <form id="process-form">
-                            <div class="mb-3">
-                                <label for="text-input" class="form-label">Text to Process</label>
-                                <textarea class="form-control" id="text-input" rows="5" placeholder="Enter text to process..."></textarea>
-                            </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="persist-check">
-                                <label class="form-check-label" for="persist-check">Save to Database</label>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Process</button>
-                            <div class="spinner-border text-primary loading mt-3" id="loading-spinner" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <div id="results-container" class="mt-4" style="display: none;">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Results</h5>
-                            <h6 id="result-title" class="card-subtitle mb-3 text-muted"></h6>
-                            
-                            <div class="alert alert-success" role="alert">
-                                <h6>Final Decision:</h6>
-                                <p id="final-decision"></p>
-                            </div>
-                            
-                            <h6>Decision Steps:</h6>
-                            <div id="steps-container"></div>
-                        </div>
-                    </div>
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="instruction-section">
+                    <h2>How to Add a New Experiment</h2>
+                    <p>To create a new experiment, follow these guidelines for modular development:</p>
+                    
+                    <h4 class="mt-4">1. Create a New Route & Template</h4>
+                    <p>Each experiment should have its own URL path and template:</p>
+                    <pre><code># In your main app.py or routes.py file
+@app.route('/experiments/your-experiment-name')
+def your_experiment():
+    return render_template('experiments/your_experiment.html')</code></pre>
+                    
+                    <h4 class="mt-4">2. Organize Template Files</h4>
+                    <p>Create a structured template directory:</p>
+                    <pre><code>templates/
+├── index.html                # Main landing page
+├── experiments/              # All experiment templates
+│   ├── experiment1.html
+│   ├── experiment2.html
+│   └── your_experiment.html  # Your new experiment</code></pre>
+                    
+                    <h4 class="mt-4">3. Keep Server Code Modular</h4>
+                    <p>Organize your Python server code into modules by experiment:</p>
+                    <pre><code>src/
+├── server/
+│   ├── app.py                # Main application entry point
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── main_routes.py    # Landing page routes
+│   │   ├── experiment1.py    # Routes for experiment 1
+│   │   └── your_experiment.py # Routes for your experiment
+│   ├── models/               # Database models
+│   │   ├── __init__.py
+│   │   └── experiment_models.py
+│   ├── services/             # Business logic by experiment
+│   │   ├── __init__.py
+│   │   ├── experiment1_service.py
+│   │   └── your_experiment_service.py</code></pre>
+                    
+                    <h4 class="mt-4">4. API Endpoints</h4>
+                    <p>Create dedicated API endpoints for each experiment:</p>
+                    <pre><code># In your experiment route file
+@app.route('/api/experiments/your-experiment/data', methods=['GET', 'POST'])
+def your_experiment_api():
+    # Experiment-specific API logic
+    return jsonify({"success": True, "data": result})</code></pre>
+                    
+                    <h4 class="mt-4">5. Static Assets</h4>
+                    <p>Organize CSS, JS, and other assets by experiment:</p>
+                    <pre><code>static/
+├── css/
+│   ├── style.css            # Common styles
+│   └── experiments/
+│       └── your_experiment.css
+├── js/
+│   └── experiments/
+│       └── your_experiment.js</code></pre>
                 </div>
             </div>
-            
-            <!-- History Tab -->
-            <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Recent Decision Chains</h5>
-                        <div class="spinner-border text-primary loading" id="history-loading" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <div id="history-container">
-                            <p>No decision chains found.</p>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2>Available Experiments</h2>
+                <div class="row">
+                    <!-- LangChain Decision Agent -->
+                    <div class="col-md-4">
+                        <div class="card experiment-card">
+                            <div class="card-body">
+                                <h5 class="card-title">LangChain Decision Agent</h5>
+                                <p class="card-text">A multi-step reasoning system for text processing and decision making.</p>
+                                <a href="/experiments/langchain-decision-agent" class="btn btn-primary">Open Experiment</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div id="chain-details-container" class="mt-4" style="display: none;">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Decision Chain Details</h5>
-                            <h6 id="chain-title" class="card-subtitle mb-3 text-muted"></h6>
-                            
-                            <div class="mb-3">
-                                <h6>Context:</h6>
-                                <p id="chain-context"></p>
+                    
+                    <!-- Placeholder card for new experiments -->
+                    <div class="col-md-4">
+                        <div class="card experiment-card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Add New Experiment</h5>
+                                <p class="card-text">Create a new experiment following the guidelines above.</p>
+                                <a href="#" class="btn btn-outline-secondary disabled">Coming Soon</a>
                             </div>
-                            
-                            <div class="alert alert-success" role="alert">
-                                <h6>Final Decision:</h6>
-                                <p id="chain-final-decision"></p>
-                            </div>
-                            
-                            <h6>Decision Steps:</h6>
-                            <div id="chain-steps-container"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <footer class="footer">
+        <footer class="footer mb-4 text-center">
             <div class="container">
-                <p>LangChain Decision Agent © 2023 | Built with Flask, LangChain, and SQLAlchemy</p>
-                <p><small>A multi-step reasoning system for text processing and decision making</small></p>
+                <p>Experimental Project Hub © 2023</p>
+                <p><small>A platform for modular web and server experiments</small></p>
             </div>
         </footer>
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Process Form
-        document.getElementById('process-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const text = document.getElementById('text-input').value;
-            const persist = document.getElementById('persist-check').checked;
-            
-            if (!text) {
-                alert('Please enter text to process');
-                return;
-            }
-            
-            // Show loading spinner
-            document.getElementById('loading-spinner').style.display = 'inline-block';
-            
-            try {
-                const response = await fetch('/api/process', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ text, persist })
-                });
-                
-                const data = await response.json();
-                
-                // Hide loading spinner
-                document.getElementById('loading-spinner').style.display = 'none';
-                
-                if (data.success) {
-                    displayResults(data.result);
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            } catch (error) {
-                document.getElementById('loading-spinner').style.display = 'none';
-                alert('Error: ' + error.message);
-            }
-        });
-        
-        // Display Results
-        function displayResults(result) {
-            // Show results container
-            document.getElementById('results-container').style.display = 'block';
-            
-            // Set title and final decision
-            document.getElementById('result-title').textContent = result.title;
-            document.getElementById('final-decision').textContent = result.final_decision;
-            
-            // Clear steps container
-            const stepsContainer = document.getElementById('steps-container');
-            stepsContainer.innerHTML = '';
-            
-            // Add steps
-            result.steps.forEach(step => {
-                const stepDiv = document.createElement('div');
-                stepDiv.className = 'decision-step';
-                
-                const header = document.createElement('div');
-                header.className = 'step-header';
-                header.textContent = `Step ${step.step_number}: ${step.decision}`;
-                stepDiv.appendChild(header);
-                
-                const reasoning = document.createElement('p');
-                reasoning.textContent = step.reasoning;
-                stepDiv.appendChild(reasoning);
-                
-                if (step.next_actions && step.next_actions.length > 0) {
-                    const actionsHeader = document.createElement('div');
-                    actionsHeader.textContent = 'Next Actions:';
-                    stepDiv.appendChild(actionsHeader);
-                    
-                    const actionsList = document.createElement('ul');
-                    step.next_actions.forEach(action => {
-                        const actionItem = document.createElement('li');
-                        actionItem.className = 'next-action';
-                        actionItem.textContent = action;
-                        actionsList.appendChild(actionItem);
-                    });
-                    stepDiv.appendChild(actionsList);
-                }
-                
-                stepsContainer.appendChild(stepDiv);
-            });
-        }
-        
-        // Load History
-        document.getElementById('history-tab').addEventListener('click', loadHistory);
-        
-        async function loadHistory() {
-            const historyContainer = document.getElementById('history-container');
-            const loadingSpinner = document.getElementById('history-loading');
-            
-            // Show loading spinner
-            loadingSpinner.style.display = 'inline-block';
-            
-            try {
-                const response = await fetch('/api/chains');
-                const data = await response.json();
-                
-                // Hide loading spinner
-                loadingSpinner.style.display = 'none';
-                
-                if (data.success && data.chains.length > 0) {
-                    // Create a table for the chains
-                    historyContainer.innerHTML = `
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Status</th>
-                                    <th>Steps</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-table-body">
-                            </tbody>
-                        </table>
-                    `;
-                    
-                    const tableBody = document.getElementById('history-table-body');
-                    
-                    data.chains.forEach(chain => {
-                        const row = document.createElement('tr');
-                        
-                        const titleCell = document.createElement('td');
-                        titleCell.textContent = chain.title;
-                        row.appendChild(titleCell);
-                        
-                        const statusCell = document.createElement('td');
-                        statusCell.textContent = chain.status;
-                        row.appendChild(statusCell);
-                        
-                        const stepsCell = document.createElement('td');
-                        stepsCell.textContent = chain.step_count;
-                        row.appendChild(stepsCell);
-                        
-                        const actionCell = document.createElement('td');
-                        const viewButton = document.createElement('button');
-                        viewButton.className = 'btn btn-sm btn-outline-primary';
-                        viewButton.textContent = 'View';
-                        viewButton.addEventListener('click', () => loadChainDetails(chain.chain_id));
-                        actionCell.appendChild(viewButton);
-                        row.appendChild(actionCell);
-                        
-                        tableBody.appendChild(row);
-                    });
-                } else {
-                    historyContainer.innerHTML = '<p>No decision chains found.</p>';
-                }
-            } catch (error) {
-                loadingSpinner.style.display = 'none';
-                historyContainer.innerHTML = `<p class="text-danger">Error loading history: ${error.message}</p>`;
-            }
-        }
-        
-        // Load Chain Details
-        async function loadChainDetails(chainId) {
-            const detailsContainer = document.getElementById('chain-details-container');
-            
-            try {
-                const response = await fetch(`/api/chains/${chainId}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    const chain = data.chain;
-                    
-                    // Set chain details
-                    document.getElementById('chain-title').textContent = chain.title;
-                    document.getElementById('chain-context').textContent = chain.context;
-                    document.getElementById('chain-final-decision').textContent = chain.final_decision || 'No final decision';
-                    
-                    // Clear steps container
-                    const stepsContainer = document.getElementById('chain-steps-container');
-                    stepsContainer.innerHTML = '';
-                    
-                    // Add steps
-                    chain.steps.forEach(step => {
-                        const stepDiv = document.createElement('div');
-                        stepDiv.className = 'decision-step';
-                        
-                        const header = document.createElement('div');
-                        header.className = 'step-header';
-                        header.textContent = `Step ${step.step_number}: ${step.decision}`;
-                        stepDiv.appendChild(header);
-                        
-                        const reasoning = document.createElement('p');
-                        reasoning.textContent = step.reasoning;
-                        stepDiv.appendChild(reasoning);
-                        
-                        if (step.next_actions && step.next_actions.length > 0) {
-                            const actionsHeader = document.createElement('div');
-                            actionsHeader.textContent = 'Next Actions:';
-                            stepDiv.appendChild(actionsHeader);
-                            
-                            const actionsList = document.createElement('ul');
-                            step.next_actions.forEach(action => {
-                                const actionItem = document.createElement('li');
-                                actionItem.className = 'next-action';
-                                actionItem.textContent = action;
-                                actionsList.appendChild(actionItem);
-                            });
-                            stepDiv.appendChild(actionsList);
-                        }
-                        
-                        stepsContainer.appendChild(stepDiv);
-                    });
-                    
-                    // Show details container
-                    detailsContainer.style.display = 'block';
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        }
-    </script>
 </body>
 </html> 
