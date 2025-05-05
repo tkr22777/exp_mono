@@ -13,58 +13,58 @@ from src.langchain_agent.persistence.models import Base
 
 class MockLLM(BaseLanguageModel):
     """Mock LLM for testing purposes."""
-    
+
     # Add a model config to allow extra fields
     model_config = {"extra": "allow"}
-    
+
     def __init__(self, responses=None):
         """Initialize with predefined responses."""
         super().__init__()
         self._responses = responses or ["This is a mock response"]
         self._invocations = []
-    
+
     def invoke(self, input_data, **kwargs):
         """Mock invoke method that returns predefined responses."""
         self._invocations.append(input_data)
         return self._responses.pop(0) if self._responses else "Default mock response"
-    
+
     def generate(self, prompts, **kwargs):
         """Mock generate method for compatibility."""
         return [self.invoke(prompt) for prompt in prompts]
-    
+
     # Add required abstract methods
     def predict(self, text, **kwargs):
         """Required abstract method."""
         return self.invoke(text, **kwargs)
-    
+
     def predict_messages(self, messages, **kwargs):
         """Required abstract method."""
         return self.invoke(messages, **kwargs)
-    
+
     def generate_prompt(self, prompts, **kwargs):
         """Required abstract method."""
         return self.generate(prompts, **kwargs)
-    
+
     async def apredict(self, text, **kwargs):
         """Required abstract method."""
         return self.predict(text, **kwargs)
-    
+
     async def apredict_messages(self, messages, **kwargs):
         """Required abstract method."""
         return self.predict_messages(messages, **kwargs)
-    
+
     async def agenerate_prompt(self, prompts, **kwargs):
         """Required abstract method."""
         return self.generate_prompt(prompts, **kwargs)
-    
+
     async def ainvoke(self, input, **kwargs):
         """Required abstract method."""
         return self.invoke(input, **kwargs)
-    
+
     async def agenerate(self, prompts, **kwargs):
         """Required abstract method."""
         return self.generate(prompts, **kwargs)
-    
+
     @property
     def metadata(self):
         """Required property."""
@@ -74,11 +74,13 @@ class MockLLM(BaseLanguageModel):
 @pytest.fixture
 def mock_llm():
     """Fixture providing a mock LLM."""
-    return MockLLM([
-        "Initial analysis of the text.",
-        "Refinement of the analysis with alternatives.",
-        "Final decision based on analysis."
-    ])
+    return MockLLM(
+        [
+            "Initial analysis of the text.",
+            "Refinement of the analysis with alternatives.",
+            "Final decision based on analysis.",
+        ]
+    )
 
 
 @pytest.fixture
@@ -115,7 +117,7 @@ def sample_decision_step():
         reasoning="Test reasoning",
         decision="Test decision",
         next_actions=["Action 1", "Action 2"],
-        metadata={"key": "value"}
+        metadata={"key": "value"},
     )
 
 
@@ -127,24 +129,24 @@ def sample_decision_chain():
         step_number=1,
         reasoning="Initial reasoning",
         decision="Initial decision",
-        next_actions=["Next step"]
+        next_actions=["Next step"],
     )
-    
+
     step2 = DecisionStep(
         step_id="step-2",
         step_number=2,
         reasoning="Secondary reasoning",
         decision="Final decision",
-        next_actions=[]
+        next_actions=[],
     )
-    
+
     return DecisionChain(
         chain_id="test-chain-id",
         title="Test Chain",
         context="Test context for decision chain",
         steps=[step1, step2],
         final_decision="The final decision",
-        status="completed"
+        status="completed",
     )
 
 
@@ -153,24 +155,24 @@ def agent_with_mock_llm(mock_llm):
     """Fixture providing a LangChainAgent with a mock LLM."""
     # Create a minimal agent with mocked components
     agent = LangChainAgent(llm=mock_llm, verbose=False)
-    
+
     # Create a simple mock executor that directly uses the mock LLM
     class MockSimpleLLMExecutor:
         def __init__(self, llm):
             self.llm = llm
-        
+
         def invoke(self, input_data):
             # Get the response from the mock LLM
             response = self.llm.invoke(input_data.get("input", ""))
-            
+
             # Handle case where response is an AIMessage or other message type
-            if hasattr(response, 'content'):
+            if hasattr(response, "content"):
                 response = response.content
-                
+
             # Return the output in the expected format
             return {"output": response}
-    
+
     # Replace the agent's executor with our mock
     agent.agent = MockSimpleLLMExecutor(mock_llm)
-    
-    return agent 
+
+    return agent

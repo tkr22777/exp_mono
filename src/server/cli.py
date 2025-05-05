@@ -3,12 +3,12 @@ Command Line Interface for Web Server
 
 This module provides a CLI for running the web server.
 """
-import click
 import os
+
+import click
 from dotenv import load_dotenv
 
-from src.server.app import run_server, app
-
+from src.server.app import app, run_server
 
 # Load environment variables
 load_dotenv()
@@ -22,7 +22,7 @@ load_dotenv()
 def main(host: str, port: int, debug: bool, timeout: int) -> None:
     """
     Run the web server.
-    
+
     Args:
         host: Host to bind the server to
         port: Port to bind the server to
@@ -31,13 +31,13 @@ def main(host: str, port: int, debug: bool, timeout: int) -> None:
     """
     # Notify the user
     click.echo(f"Starting server on {host}:{port}")
-    
+
     # Configure request timeout
-    app.config['REQUEST_TIMEOUT'] = timeout
-    
+    app.config["REQUEST_TIMEOUT"] = timeout
+
     # Run the server
     run_server(host=host, port=port, debug=debug)
 
 
 if __name__ == "__main__":
-    main() 
+    main()

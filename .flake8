@@ -3,4 +3,11 @@ max-line-length = 88
 extend-ignore = E203
 exclude = .git,__pycache__,dist,build,.venv
 per-file-ignores =
-    __init__.py: F401 
+    __init__.py: F401
+    */langchain_agent/*.py: F401,F841,E501,W293 
+    */llms/*.py: F401,E501
+    tests/*: F401,E501
+    tests/langchain_agent/persistence/test_database.py: F401,F811,E501
+    tests/conftest.py: F401,F811,E501
+    python_experiment.py: F401,F541
+    src/server/cli.py: F401 

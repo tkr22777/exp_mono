@@ -8,7 +8,7 @@ import json
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import Session, relationship, declarative_base
+from sqlalchemy.orm import Session, declarative_base, relationship
 
 from src.langchain_agent.agent import DecisionChain, DecisionStep
 
@@ -33,12 +33,14 @@ class ChainModel(Base):
     )
 
     # Relationship with steps
-    steps = relationship("StepModel", back_populates="chain", cascade="all, delete-orphan")
+    steps = relationship(
+        "StepModel", back_populates="chain", cascade="all, delete-orphan"
+    )
 
     def to_pydantic(self) -> DecisionChain:
         """
         Convert the SQLAlchemy model to a Pydantic model.
-        
+
         Returns:
             DecisionChain: A Pydantic model instance
         """
@@ -55,10 +57,10 @@ class ChainModel(Base):
     def from_pydantic(cls, chain: DecisionChain) -> "ChainModel":
         """
         Create a SQLAlchemy model from a Pydantic model.
-        
+
         Args:
             chain: The Pydantic model to convert
-            
+
         Returns:
             ChainModel: A SQLAlchemy model instance
         """
@@ -79,7 +81,9 @@ class StepModel(Base):
 
     id = Column(Integer, primary_key=True)
     step_id = Column(String(36), unique=True, index=True)
-    chain_id = Column(String(36), ForeignKey("decision_chains.chain_id"), nullable=False)
+    chain_id = Column(
+        String(36), ForeignKey("decision_chains.chain_id"), nullable=False
+    )
     step_number = Column(Integer, nullable=False)
     reasoning = Column(Text, nullable=False)
     decision = Column(Text, nullable=False)
@@ -93,7 +97,7 @@ class StepModel(Base):
     def to_pydantic(self) -> DecisionStep:
         """
         Convert the SQLAlchemy model to a Pydantic model.
-        
+
         Returns:
             DecisionStep: A Pydantic model instance
         """
@@ -110,11 +114,11 @@ class StepModel(Base):
     def from_pydantic(cls, step: DecisionStep, chain_id: str) -> "StepModel":
         """
         Create a SQLAlchemy model from a Pydantic model.
-        
+
         Args:
             step: The Pydantic model to convert
             chain_id: The ID of the parent chain
-            
+
         Returns:
             StepModel: A SQLAlchemy model instance
         """
@@ -130,17 +134,20 @@ class StepModel(Base):
 
 
 def get_or_create(
-    session: Session, model: Type[T], defaults: Optional[Dict[str, Any]] = None, **kwargs
+    session: Session,
+    model: Type[T],
+    defaults: Optional[Dict[str, Any]] = None,
+    **kwargs,
 ) -> T:
     """
     Get an existing instance or create a new one.
-    
+
     Args:
         session: SQLAlchemy session
         model: The model class
         defaults: Default values for new instances
         **kwargs: Filters for the query
-        
+
     Returns:
         An instance of the model
     """
@@ -154,4 +161,4 @@ def get_or_create(
     instance = model(**params)
     session.add(instance)
     session.flush()
-    return instance 
+    return instance

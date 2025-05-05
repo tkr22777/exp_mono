@@ -13,7 +13,11 @@ from typing import Optional
 
 import click
 
-from src.langchain_agent.api import DecisionChain, LangChainDecisionResult, process_with_langchain
+from src.langchain_agent.api import (
+    DecisionChain,
+    LangChainDecisionResult,
+    process_with_langchain,
+)
 from src.langchain_agent.persistence.api import (
     PersistentLangChainAgent,
     create_persistent_agent,
@@ -50,7 +54,9 @@ def display_results(results: ProcessingResult) -> None:
     click.echo(f"{results.ai_response}")
 
 
-def display_langchain_results(chain: DecisionChain, result: LangChainDecisionResult) -> None:
+def display_langchain_results(
+    chain: DecisionChain, result: LangChainDecisionResult
+) -> None:
     """
     Display the LangChain decision-making results in a formatted way.
 
@@ -62,7 +68,7 @@ def display_langchain_results(chain: DecisionChain, result: LangChainDecisionRes
     click.echo(f"Chain ID: {result.chain_id}")
     click.echo(f"Title: {result.title}")
     click.echo(f"Steps: {result.step_count}")
-    
+
     # Display each step in the decision process
     for i, step in enumerate(chain.steps, 1):
         click.echo(f"\n📌 Decision Step {i}:")
@@ -70,7 +76,7 @@ def display_langchain_results(chain: DecisionChain, result: LangChainDecisionRes
         click.echo(f"  Decision: {step.decision}")
         if step.next_actions:
             click.echo(f"  Next Actions: {', '.join(step.next_actions)}")
-    
+
     click.echo(f"\n🎯 FINAL DECISION:")
     click.echo(f"{result.final_decision}")
 
@@ -83,18 +89,22 @@ def display_recent_chains(limit: int = 5) -> None:
         limit: Maximum number of chains to display
     """
     chains = get_recent_chains(limit=limit)
-    
+
     if not chains:
         click.echo("\n📝 No recent decision chains found.")
         return
-    
+
     click.echo(f"\n📝 RECENT DECISION CHAINS ({len(chains)}):")
     for i, chain in enumerate(chains, 1):
         click.echo(f"{i}. {chain.title} (ID: {chain.chain_id[:8]}...)")
         click.echo(f"   Status: {chain.status}")
         click.echo(f"   Steps: {len(chain.steps)}")
         if chain.final_decision:
-            decision_preview = chain.final_decision[:50] + "..." if len(chain.final_decision) > 50 else chain.final_decision
+            decision_preview = (
+                chain.final_decision[:50] + "..."
+                if len(chain.final_decision) > 50
+                else chain.final_decision
+            )
             click.echo(f"   Decision: {decision_preview}")
         click.echo("")
 
@@ -102,9 +112,15 @@ def display_recent_chains(limit: int = 5) -> None:
 @click.command()
 @click.option("--name", default="World", help="Who to greet")
 @click.option("--text", help="Text to process")
-@click.option("--use-langchain", is_flag=True, help="Whether to use LangChain for decision making")
-@click.option("--persist", is_flag=True, help="Whether to persist decisions to database")
-@click.option("--list-recent", is_flag=True, help="List recent decision chains from database")
+@click.option(
+    "--use-langchain", is_flag=True, help="Whether to use LangChain for decision making"
+)
+@click.option(
+    "--persist", is_flag=True, help="Whether to persist decisions to database"
+)
+@click.option(
+    "--list-recent", is_flag=True, help="List recent decision chains from database"
+)
 @click.option("--chain-id", help="Load a specific decision chain by ID")
 def main(
     name: str,
@@ -121,14 +137,14 @@ def main(
     if list_recent:
         display_recent_chains()
         return 0
-    
+
     # Load a specific chain if requested
     if chain_id:
         click.echo(f"\nLoading decision chain {chain_id}...")
         try:
             agent = create_persistent_agent()
             chain = agent.load_chain(chain_id)
-            
+
             if chain:
                 result = LangChainDecisionResult(
                     title=chain.title,
@@ -142,7 +158,7 @@ def main(
                 click.echo(f"❌ Chain with ID {chain_id} not found.")
         except Exception as e:
             click.echo(f"\n❌ Error loading chain: {e}")
-        
+
         return 0
 
     if text:
@@ -158,7 +174,7 @@ def main(
                     # Use the persistent agent
                     agent = create_persistent_agent()
                     chain, chain_id = agent.process_text_with_persistence(text)
-                    
+
                     result = LangChainDecisionResult(
                         title=chain.title,
                         final_decision=chain.final_decision or "No final decision",
@@ -166,7 +182,7 @@ def main(
                         context=chain.context,
                         chain_id=chain.chain_id,
                     )
-                    
+
                     click.echo(f"\n💾 Decision chain saved with ID: {chain_id}")
                     display_langchain_results(chain, result)
                 else:
@@ -175,7 +191,9 @@ def main(
                     display_langchain_results(chain, langchain_results)
             except Exception as e:
                 click.echo(f"\n❌ Error processing with LangChain: {e}")
-                click.echo("Make sure you have installed langchain and related dependencies.")
+                click.echo(
+                    "Make sure you have installed langchain and related dependencies."
+                )
 
     return 0
 

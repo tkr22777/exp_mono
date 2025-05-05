@@ -1,1 +1,1 @@
-"""Tests package for video AI application.""" 
+"""Tests package for video AI application."""

@@ -1,10 +1,13 @@
-from pydantic import BaseModel
 from typing import List
+
+from pydantic import BaseModel
+
 
 class Asset(BaseModel):
     name: str
     type: str
     details: str
+
 
 class Action(BaseModel):
     description: str
@@ -13,14 +16,16 @@ class Action(BaseModel):
     startPosition: str
     endPosition: str
 
+
 class Scene(BaseModel):
     description: str
     assets: List[Asset]
     dialogue: List[str]
     actions: List[Action]
 
+
 class Storyboard(BaseModel):
     mainGoal: str
     objectives: List[str]
     keyScenes: List[Scene]
-    transitions: List[str] 
+    transitions: List[str]

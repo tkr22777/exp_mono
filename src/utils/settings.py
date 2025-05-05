@@ -10,6 +10,7 @@ from typing import Optional
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     """Application settings loaded from environment variables with validation."""
 
@@ -19,7 +20,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # --- OpenAI --- 
+    # --- OpenAI ---
     OPENAI_API_KEY: str = Field(..., description="OpenAI API key")
     OPENAI_ORG: Optional[str] = Field(
         None, description="OpenAI organization ID (required for project API keys)"
@@ -30,7 +31,7 @@ class Settings(BaseSettings):
         0.7, description="Temperature for OpenAI response generation"
     )
 
-    # --- Google Gemini --- 
+    # --- Google Gemini ---
     GEMINI_API_KEY: Optional[str] = Field(
         None, description="Google Gemini API key (optional)"
     )
@@ -41,7 +42,7 @@ class Settings(BaseSettings):
         0.15, description="Temperature for Gemini response generation"
     )
 
-    # --- Deepseek --- 
+    # --- Deepseek ---
     DEEPSEEK_API_KEY: Optional[str] = Field(
         None, description="Deepseek API key (optional)"
     )
@@ -59,10 +60,11 @@ class Settings(BaseSettings):
             raise ValueError(f"Temperature must be between 0.0 and 1.0, got {v}")
         return v
 
+
 # Singleton instance for the application
 try:
     settings = Settings()
 except Exception as e:
     print(f"Error loading settings: {e}")
     print("Check your .env file to make sure it contains the required values.")
-    sys.exit(1) 
+    sys.exit(1)

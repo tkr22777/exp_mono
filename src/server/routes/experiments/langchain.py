@@ -4,17 +4,19 @@ LangChain Decision Agent Routes
 This module defines all routes for the LangChain Decision Agent experiment.
 """
 
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, jsonify, render_template, request
 
 from src.langchain_agent.api import process_with_langchain
 from src.langchain_agent.persistence.api import (
     create_persistent_agent,
-    get_recent_chains,
     get_decision_chain,
+    get_recent_chains,
 )
 
 # Create a Blueprint for LangChain routes with a URL prefix
-langchain_bp = Blueprint('langchain', __name__, url_prefix='/experiments/langchain-decision-agent')
+langchain_bp = Blueprint(
+    "langchain", __name__, url_prefix="/experiments/langchain-decision-agent"
+)
 
 
 @langchain_bp.route("/", methods=["GET"])
@@ -27,20 +29,20 @@ def index():
 def process_text():
     """Process text using the LangChain agent."""
     data = request.json
-    
+
     if not data or "text" not in data:
         return jsonify({"error": "Text is required"}), 400
-    
+
     # Extract parameters
     text = data["text"]
     persist = data.get("persist", False)
-    
+
     try:
         if persist:
             # Use persistent agent
             agent = create_persistent_agent()
             chain, chain_id = agent.process_text_with_persistence(text)
-            
+
             # Convert to response format
             response = {
                 "success": True,
@@ -63,7 +65,7 @@ def process_text():
         else:
             # Use standard agent
             chain, result = process_with_langchain(text)
-            
+
             # Convert to response format
             response = {
                 "success": True,
@@ -83,9 +85,9 @@ def process_text():
                     ],
                 },
             }
-        
+
         return jsonify(response)
-    
+
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -96,10 +98,10 @@ def get_chains():
     try:
         # Get limit parameter or default to 10
         limit = request.args.get("limit", default=10, type=int)
-        
+
         # Get chains
         chains = get_recent_chains(limit=limit)
-        
+
         # Convert to response format
         response = {
             "success": True,
@@ -114,9 +116,9 @@ def get_chains():
                 for chain in chains
             ],
         }
-        
+
         return jsonify(response)
-    
+
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -127,10 +129,10 @@ def get_chain(chain_id):
     try:
         # Get chain
         chain = get_decision_chain(chain_id)
-        
+
         if not chain:
             return jsonify({"success": False, "error": "Chain not found"}), 404
-        
+
         # Convert to response format
         response = {
             "success": True,
@@ -152,8 +154,8 @@ def get_chain(chain_id):
                 ],
             },
         }
-        
+
         return jsonify(response)
-    
+
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500 
+        return jsonify({"success": False, "error": str(e)}), 500

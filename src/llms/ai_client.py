@@ -7,7 +7,7 @@ from typing import Optional
 
 import google.generativeai as genai
 from openai import OpenAI
-from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 from src.utils.settings import settings
 
@@ -28,19 +28,23 @@ class AIClient:
         """
         openai_key = api_key or settings.OPENAI_API_KEY
         openai_org = getattr(settings, "OPENAI_ORG", None)
-        
+
         if openai_key.startswith("sk-proj-"):
             if not openai_org:
-                print("Warning: Using a project API key but no organization ID is set. This may cause authentication issues.")
+                print(
+                    "Warning: Using a project API key but no organization ID is set. This may cause authentication issues."
+                )
             else:
-                print(f"Using OpenAI project API key with organization ID: {openai_org}")
-            
+                print(
+                    f"Using OpenAI project API key with organization ID: {openai_org}"
+                )
+
         client_args = {"api_key": openai_key}
         if openai_org:
             client_args["organization"] = openai_org
-            
+
         self.client = OpenAI(**client_args)
-        
+
         self.model_name = settings.MODEL_NAME
         self.max_tokens = settings.MAX_TOKENS
         self.temperature = settings.TEMPERATURE
@@ -83,7 +87,7 @@ class AIClient:
 
         Returns:
             The generated response from Gemini
-        
+
         Raises:
             ValueError: If the Gemini API key is not configured
         """
@@ -95,9 +99,9 @@ class AIClient:
 
         try:
             genai.configure(api_key=settings.GEMINI_API_KEY)
-            
+
             model = genai.GenerativeModel(settings.GEMINI_MODEL)
-            
+
             # Handle different versions of the Gemini API for generation config
             try:
                 generation_config = genai.types.GenerationConfig(
@@ -108,19 +112,18 @@ class AIClient:
                 generation_config = genai.types.GenerationConfig(
                     temperature=settings.GEMINI_TEMPERATURE,
                 )
-            
+
             response = model.generate_content(
-                input_data,
-                generation_config=generation_config
+                input_data, generation_config=generation_config
             )
-            
+
             return response.text
         except Exception as e:
             return f"Error generating Gemini response: {str(e)}"
 
     @retry(
         stop=stop_after_attempt(1),  # Initial attempt + retries combined
-        wait=wait_fixed(0.2),        # Wait 0.2 second between retries
+        wait=wait_fixed(0.2),  # Wait 0.2 second between retries
         retry=retry_if_exception_type(Exception),
     )
     def generate_with_deepseek(self, prompt: str) -> str:
@@ -132,7 +135,7 @@ class AIClient:
 
         Returns:
             The generated response from Deepseek
-            
+
         Raises:
             ValueError: If the Deepseek API key is not configured
         """
@@ -141,9 +144,9 @@ class AIClient:
                 "Deepseek API key not found in settings. "
                 "Please add DEEPSEEK_API_KEY to your .env file."
             )
-            
+
         system_prompt = settings.DEEPSEEK_SYSTEM_PROMPT
-            
+
         try:
             client = OpenAI(
                 api_key=settings.DEEPSEEK_API_KEY,

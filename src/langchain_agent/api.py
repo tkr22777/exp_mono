@@ -24,10 +24,10 @@ class LangChainDecisionResult(BaseModel):
 def _convert_to_result(chain: DecisionChain) -> LangChainDecisionResult:
     """
     Convert a DecisionChain to a LangChainDecisionResult.
-    
+
     Args:
         chain: The decision chain to convert
-        
+
     Returns:
         A LangChainDecisionResult summarizing the decision chain
     """
@@ -43,24 +43,24 @@ def _convert_to_result(chain: DecisionChain) -> LangChainDecisionResult:
 def process_with_langchain(text: str) -> Tuple[DecisionChain, LangChainDecisionResult]:
     """
     Process text using the LangChain decision-making agent.
-    
+
     This function creates a decision chain based on the input text,
     processes it through multiple steps, and returns both the full chain
     and a simplified result.
-    
+
     Args:
         text: The input text to process
-        
+
     Returns:
         A tuple containing the full decision chain and a simplified result
     """
     # Create the agent
     agent = create_agent()
-    
+
     # Process the text
     chain = agent.process_text(text)
-    
+
     # Convert to result
     result = _convert_to_result(chain)
-    
-    return chain, result 
+
+    return chain, result

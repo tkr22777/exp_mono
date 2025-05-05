@@ -3,4 +3,4 @@
 # Make settings available at package level
 from src.utils.settings import settings
 
-__all__ = ["settings"] 
+__all__ = ["settings"]
