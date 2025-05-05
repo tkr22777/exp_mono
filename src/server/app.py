@@ -7,7 +7,7 @@ from flask import Flask
 from flask_cors import CORS
 
 # Import blueprints
-from src.server.routes import langchain_bp, main_bp
+from src.server.routes import langchain_bp, main_bp, text_processor_bp
 
 # Initialize Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
@@ -18,6 +18,7 @@ CORS(app)
 # Register blueprints
 app.register_blueprint(main_bp)
 app.register_blueprint(langchain_bp)
+app.register_blueprint(text_processor_bp)
 
 
 def create_app() -> Flask:

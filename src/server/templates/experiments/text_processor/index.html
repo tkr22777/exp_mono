@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Processor</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/static/css/style.css" rel="stylesheet">
+    <style>
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        #input-counter {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="mb-0">Text Processor</h1>
+            <a href="/" class="btn btn-outline-secondary">← Back to Home</a>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Process Text</h5>
+                <p class="card-text">Enter text below and see it processed in real-time</p>
+                
+                <div class="mb-3">
+                    <label for="text-input" class="form-label">Text Input</label>
+                    <textarea id="text-input" class="form-control" rows="5" placeholder="Start typing here..."></textarea>
+                    <div id="input-counter" class="mt-1">0 characters</div>
+                </div>
+                
+                <div id="result-container" class="result-container">
+                    <h6>Processed Result:</h6>
+                    <div id="processed-result" class="p-3 border rounded"></div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer mt-3">
+            <div class="container">
+                <p>Text Processor © 2023 | Built with Flask and JavaScript</p>
+                <p><small>A real-time text processing system with server-side processing</small></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // DOM elements
+        const textInput = document.getElementById('text-input');
+        const inputCounter = document.getElementById('input-counter');
+        const resultContainer = document.getElementById('result-container');
+        const processedResult = document.getElementById('processed-result');
+        
+        // Debounce function to limit API calls
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+        
+        // Process text through API
+        const processText = debounce(async (text) => {
+            if (!text.trim()) {
+                resultContainer.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/experiments/text-processor/api/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Display the processed text
+                    processedResult.textContent = data.result.processed_text;
+                    resultContainer.style.display = 'block';
+                } else {
+                    console.error('Error:', data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }, 300); // 300ms debounce
+        
+        // Event listeners
+        textInput.addEventListener('input', function() {
+            const text = this.value;
+            
+            // Update character counter
+            inputCounter.textContent = `${text.length} characters`;
+            
+            // Process text
+            processText(text);
+        });
+    </script>
+</body>
+</html> 
