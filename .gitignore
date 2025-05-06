@@ -37,4 +37,16 @@ htmlcov/
 
 # Environments
 .env
-# Only add other environment files here if needed in the future 
+# Only add other environment files here if needed in the future
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Tailwind CSS
+src/server/static/css/tailwind.css
+
+# Build artifacts
+**/dist/ 
