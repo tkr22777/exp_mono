@@ -11,11 +11,20 @@ text_processor_bp = Blueprint(
     "text_processor", __name__, url_prefix="/experiments/text-processor"
 )
 
+# Experiment configuration parameters
+EXPERIMENT_CONFIG = {
+    "debounce_delay_ms": 5000,  # Debounce delay in milliseconds
+    "default_text": "",  # Default text to show in the input area
+    "max_text_length": 5000,  # Maximum allowed text length
+}
+
 
 @text_processor_bp.route("/", methods=["GET"])
 def index():
     """Serve the Text Processor experiment page."""
-    return render_template("experiments/text_processor/index.html")
+    return render_template(
+        "experiments/text_processor/index.html", config=EXPERIMENT_CONFIG
+    )
 
 
 @text_processor_bp.route("/api/process", methods=["POST"])
