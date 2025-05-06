@@ -4,72 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Experimental Project Hub</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="/static/css/style.css" rel="stylesheet">
-    <style>
-        .experiment-card {
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-        .experiment-card:hover {
-            transform: translateY(-5px);
-        }
-        .instruction-section {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        code {
-            background-color: #e9ecef;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-        pre {
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-    </style>
+    <!-- Tailwind CSS -->
+    <link href="/static/css/tailwind.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container mt-5">
-        <div class="row mb-4">
-            <div class="col-12">
-                <h1 class="display-4">Experimental Project Hub</h1>
-                <p class="lead">Welcome to the experimental project hub. This is a central landing page for various web experiments and prototypes.</p>
-                <hr class="my-4">
+<body class="bg-gray-50">
+    <div class="container mx-auto max-w-5xl px-4 py-8">
+        <div class="mb-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Experimental Project Hub</h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Welcome to the experimental project hub. This is a central landing page for various web experiments and prototypes.</p>
+                <div class="mt-4 border-t border-gray-200 pt-4"></div>
             </div>
         </div>
         
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="instruction-section">
-                    <h2>How to Add a New Experiment</h2>
-                    <p>To create a new experiment, follow these guidelines for modular development:</p>
-                    
-                    <h4 class="mt-4">1. Create a New Route & Template</h4>
-                    <p>Each experiment should have its own URL path and template:</p>
-                    <pre><code># In your main app.py or routes.py file
+        <div class="mb-12">
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-4">How to Add a New Experiment</h2>
+                <p class="mb-4">To create a new experiment, follow these guidelines for modular development:</p>
+                
+                <h4 class="text-lg font-semibold mt-6 mb-2">1. Create a New Route & Template</h4>
+                <p class="mb-2">Each experiment should have its own URL path and template:</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre class="text-sm text-gray-700 whitespace-pre"># In your main app.py or routes.py file
 @app.route('/experiments/your-experiment-name')
 def your_experiment():
-    return render_template('experiments/your_experiment.html')</code></pre>
-                    
-                    <h4 class="mt-4">2. Organize Template Files</h4>
-                    <p>Create a structured template directory:</p>
-                    <pre><code>templates/
+    return render_template('experiments/your_experiment.html')</pre>
+                </div>
+                
+                <h4 class="text-lg font-semibold mt-6 mb-2">2. Organize Template Files</h4>
+                <p class="mb-2">Create a structured template directory:</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre class="text-sm text-gray-700 whitespace-pre">templates/
 ├── index.html                # Main landing page
 ├── experiments/              # All experiment templates
 │   ├── experiment1.html
 │   ├── experiment2.html
-│   └── your_experiment.html  # Your new experiment</code></pre>
-                    
-                    <h4 class="mt-4">3. Keep Server Code Modular</h4>
-                    <p>Organize your Python server code into modules by experiment:</p>
-                    <pre><code>src/
+│   └── your_experiment.html  # Your new experiment</pre>
+                </div>
+                
+                <h4 class="text-lg font-semibold mt-6 mb-2">3. Keep Server Code Modular</h4>
+                <p class="mb-2">Organize your Python server code into modules by experiment:</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre class="text-sm text-gray-700 whitespace-pre">src/
 ├── server/
 │   ├── app.py                # Main application entry point
 │   ├── routes/
@@ -83,79 +59,70 @@ def your_experiment():
 │   ├── services/             # Business logic by experiment
 │   │   ├── __init__.py
 │   │   ├── experiment1_service.py
-│   │   └── your_experiment_service.py</code></pre>
-                    
-                    <h4 class="mt-4">4. API Endpoints</h4>
-                    <p>Create dedicated API endpoints for each experiment:</p>
-                    <pre><code># In your experiment route file
+│   │   └── your_experiment_service.py</pre>
+                </div>
+                
+                <h4 class="text-lg font-semibold mt-6 mb-2">4. API Endpoints</h4>
+                <p class="mb-2">Create dedicated API endpoints for each experiment:</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre class="text-sm text-gray-700 whitespace-pre"># In your experiment route file
 @app.route('/api/experiments/your-experiment/data', methods=['GET', 'POST'])
 def your_experiment_api():
     # Experiment-specific API logic
-    return jsonify({"success": True, "data": result})</code></pre>
-                    
-                    <h4 class="mt-4">5. Static Assets</h4>
-                    <p>Organize CSS, JS, and other assets by experiment:</p>
-                    <pre><code>static/
+    return jsonify({"success": True, "data": result})</pre>
+                </div>
+                
+                <h4 class="text-lg font-semibold mt-6 mb-2">5. Static Assets</h4>
+                <p class="mb-2">Organize CSS, JS, and other assets by experiment:</p>
+                <div class="bg-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre class="text-sm text-gray-700 whitespace-pre">static/
 ├── css/
 │   ├── style.css            # Common styles
 │   └── experiments/
 │       └── your_experiment.css
 ├── js/
 │   └── experiments/
-│       └── your_experiment.js</code></pre>
+│       └── your_experiment.js</pre>
                 </div>
             </div>
         </div>
         
-        <div class="row mb-5">
-            <div class="col-12">
-                <h2>Available Experiments</h2>
-                <div class="row">
-                    <!-- LangChain Decision Agent -->
-                    <div class="col-md-4">
-                        <div class="card experiment-card">
-                            <div class="card-body">
-                                <h5 class="card-title">LangChain Decision Agent</h5>
-                                <p class="card-text">A multi-step reasoning system for text processing and decision making.</p>
-                                <a href="/experiments/langchain-decision-agent" class="btn btn-primary">Open Experiment</a>
-                            </div>
-                        </div>
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Available Experiments</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- LangChain Decision Agent -->
+                <div class="bg-white shadow-md rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <div class="p-6">
+                        <h5 class="text-lg font-semibold mb-2">LangChain Decision Agent</h5>
+                        <p class="text-gray-600 mb-4">A multi-step reasoning system for text processing and decision making.</p>
+                        <a href="/experiments/langchain-decision-agent" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Open Experiment</a>
                     </div>
-                    
-                    <!-- Text Processor Experiment -->
-                    <div class="col-md-4">
-                        <div class="card experiment-card">
-                            <div class="card-body">
-                                <h5 class="card-title">Text Processor</h5>
-                                <p class="card-text">A real-time text processing system with server-side processing.</p>
-                                <a href="/experiments/text-processor" class="btn btn-primary">Open Experiment</a>
-                            </div>
-                        </div>
+                </div>
+                
+                <!-- Text Processor Experiment -->
+                <div class="bg-white shadow-md rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <div class="p-6">
+                        <h5 class="text-lg font-semibold mb-2">Text Processor</h5>
+                        <p class="text-gray-600 mb-4">A real-time text processing system with server-side processing.</p>
+                        <a href="/experiments/text-processor" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Open Experiment</a>
                     </div>
-                    
-                    <!-- Placeholder card for new experiments -->
-                    <div class="col-md-4">
-                        <div class="card experiment-card bg-light">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Add New Experiment</h5>
-                                <p class="card-text">Create a new experiment following the guidelines above.</p>
-                                <a href="#" class="btn btn-outline-secondary disabled">Coming Soon</a>
-                            </div>
-                        </div>
+                </div>
+                
+                <!-- Placeholder card for new experiments -->
+                <div class="bg-gray-100 shadow-md rounded-lg overflow-hidden">
+                    <div class="p-6 text-center">
+                        <h5 class="text-lg font-semibold mb-2">Add New Experiment</h5>
+                        <p class="text-gray-600 mb-4">Create a new experiment following the guidelines above.</p>
+                        <button class="inline-block px-4 py-2 bg-gray-300 text-gray-500 rounded-md cursor-not-allowed">Coming Soon</button>
                     </div>
                 </div>
             </div>
         </div>
         
-        <footer class="footer mb-4 text-center">
-            <div class="container">
-                <p>Experimental Project Hub © 2023</p>
-                <p><small>A platform for modular web and server experiments</small></p>
-            </div>
+        <footer class="mt-12 mb-6 text-center text-gray-600">
+            <p>Experimental Project Hub © 2023</p>
+            <p class="text-sm">A platform for modular web and server experiments</p>
         </footer>
     </div>
-
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

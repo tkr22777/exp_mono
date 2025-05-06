@@ -1,0 +1,14 @@
+{
+  "name": "exp-mono-tailwind",
+  "version": "1.0.0",
+  "description": "Tailwind CSS setup for experimental project",
+  "scripts": {
+    "build:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --minify",
+    "dev:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.3",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.27"
+  }
+} 

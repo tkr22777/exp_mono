@@ -1,4 +1,4 @@
-.PHONY: setup check clean help run lint format type-check install test serve serve-dev
+.PHONY: setup check clean help run lint format type-check install test serve serve-dev build-ui build-ui-dev build-css build-css-dev
 
 # Variables
 PYTHON = python3
@@ -27,6 +27,10 @@ help:
 	@echo "  make serve-dev   - Run the web server in development mode"
 	@echo "    HOST=0.0.0.0                     - Host to bind to (optional)"
 	@echo "    PORT=5000                        - Port to bind to (optional)"
+	@echo "  make build-ui    - Build UI components (production mode)"
+	@echo "  make build-ui-dev - Build UI components (development mode with watch)"
+	@echo "  make build-css   - Build Tailwind CSS (production mode)"
+	@echo "  make build-css-dev - Build Tailwind CSS (development mode with watch)"
 
 # Setup the development environment
 setup: install
@@ -118,9 +122,33 @@ serve-dev: install
 	@echo "Starting development web server on $(HOST):$(PORT)..."
 	@poetry run python server.py --host $(HOST) --port $(PORT) --debug || echo "❌ Server failed to start"
 
+# Build UI components (production mode)
+build-ui: build-css
+	@echo "Building UI components..."
+	@cd src/server/static/js/experiments/text_processor && npm install && npm run build
+
+# Build UI components (development mode with watch)
+build-ui-dev: build-css-dev
+	@echo "Building UI components (development mode)..."
+	@cd src/server/static/js/experiments/text_processor && npm install && npm run dev
+
+# Build Tailwind CSS (production mode)
+build-css:
+	@echo "Building Tailwind CSS..."
+	@cd src/server/static && npm install && npm run build:css
+
+# Build Tailwind CSS (development mode with watch)
+build-css-dev:
+	@echo "Building Tailwind CSS (development mode)..."
+	@cd src/server/static && npm install && npm run dev:css
+
 # Clean up
 clean:
 	@rm -rf __pycache__ $(SRC_DIR)/__pycache__ $(TEST_DIR)/__pycache__ \
 		$(SRC_DIR)/**/__pycache__ $(TEST_DIR)/**/__pycache__ \
 		*.pyc $(SRC_DIR)/*.pyc $(TEST_DIR)/*.pyc $(SRC_DIR)/**/*.pyc $(TEST_DIR)/**/*.pyc \
-		.pytest_cache .coverage .mypy_cache 
+		.pytest_cache .coverage .mypy_cache \
+		src/server/static/js/experiments/text_processor/node_modules \
+		src/server/static/js/experiments/text_processor/dist \
+		src/server/static/node_modules \
+		src/server/static/css/tailwind.css 

@@ -13,7 +13,7 @@ text_processor_bp = Blueprint(
 
 # Experiment configuration parameters
 EXPERIMENT_CONFIG = {
-    "debounce_delay_ms": 5000,  # Debounce delay in milliseconds
+    "debounce_delay_ms": 1,  # Debounce delay in milliseconds
     "default_text": "",  # Default text to show in the input area
     "max_text_length": 5000,  # Maximum allowed text length
 }
