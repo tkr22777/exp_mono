@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const TextInput = ({ value, onChange, maxLength }) => {
+const TextInput = ({ value, onChange, maxLength, disabled }) => {
   const [charCount, setCharCount] = useState(value.length);
 
   useEffect(() => {
@@ -18,15 +18,21 @@ const TextInput = ({ value, onChange, maxLength }) => {
       </label>
       <textarea 
         id="text-input" 
-        className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+        className={`w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+          disabled ? 'bg-gray-100 cursor-not-allowed' : ''
+        }`}
         rows="5" 
-        placeholder="Start typing here..." 
+        placeholder="Start typing here or use the audio recorder below..." 
         maxLength={maxLength}
         value={value}
         onChange={handleChange}
+        disabled={disabled}
       />
-      <div className="mt-1 text-xs text-gray-500">
-        {charCount} characters
+      <div className="mt-1 text-xs text-gray-500 flex justify-between">
+        <span>
+          {charCount} characters
+        </span>
+        {disabled && <span className="text-blue-600">Input disabled during transcription...</span>}
       </div>
     </div>
   );
