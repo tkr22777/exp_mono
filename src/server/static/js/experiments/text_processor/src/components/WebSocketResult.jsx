@@ -1,150 +1,130 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { io } from 'socket.io-client';
 
 /**
- * WebSocketResult Component
- * 
- * This component establishes a WebSocket connection to the server
- * and displays processing results streamed in real-time.
+ * WebSocketResult Component - Displays streaming results using Socket.IO
  */
 const WebSocketResult = ({ inputText, audioBlob }) => {
   const [connected, setConnected] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
-  const wsRef = useRef(null);
-  const reconnectTimeoutRef = useRef(null);
+  const socketRef = useRef(null);
+  const processingRef = useRef(false);
+  const latestInputRef = useRef('');
+  const processingTimeoutRef = useRef(null);
 
-  // Connect to WebSocket and handle connection lifecycle
+  // Connect to Socket.IO
   useEffect(() => {
-    const connectWebSocket = () => {
-      // Clear any existing error state when attempting to connect
+    setError(null);
+
+    const socket = io(window.location.origin, {
+      path: '/socket.io',
+      transports: ['websocket', 'polling'],
+      autoConnect: true,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
+    });
+    
+    socketRef.current = socket;
+    socket.emit('join', { namespace: '/experiments/text-processor/ws' });
+
+    socket.on('connect', () => {
+      setConnected(true);
       setError(null);
+    });
 
-      // Determine the WebSocket URL (secure or not)
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.host;
-      const wsUrl = `${protocol}//${host}/experiments/text-processor/ws`;
-
-      try {
-        // Create a new WebSocket connection
-        const ws = new WebSocket(wsUrl);
-        wsRef.current = ws;
-
-        // Setup event handlers
-        ws.onopen = () => {
-          console.log('WebSocket connection established');
-          setConnected(true);
-        };
-
-        ws.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
-            
-            if (data.type === 'processing_start') {
-              setProcessing(true);
-              // Clear previous results when a new processing starts
-              setResults([]);
-            } 
-            else if (data.type === 'processing_update') {
-              // Add the new chunk to results
-              setResults(prevResults => [...prevResults, data.chunk]);
-            } 
-            else if (data.type === 'processing_complete') {
-              setProcessing(false);
-            } 
-            else if (data.type === 'error') {
-              setError(data.message || 'An error occurred during processing');
-              setProcessing(false);
-            }
-          } catch (e) {
-            console.error('Error parsing WebSocket message:', e);
-            setError('Failed to parse server message');
-          }
-        };
-
-        ws.onclose = (event) => {
-          setConnected(false);
-          
-          // WebSocket closed unexpectedly - attempt to reconnect
-          if (!event.wasClean) {
-            setError('WebSocket connection lost, attempting to reconnect...');
-            
-            // Try to reconnect after a delay
-            reconnectTimeoutRef.current = setTimeout(connectWebSocket, 3000);
-          }
-        };
-
-        ws.onerror = (error) => {
-          console.error('WebSocket error:', error);
-          setError('WebSocket connection error');
-          ws.close();
-        };
-
-      } catch (err) {
-        console.error('Failed to establish WebSocket connection:', err);
-        setError('Failed to connect to the server via WebSocket');
-        
-        // Try to reconnect after a delay
-        reconnectTimeoutRef.current = setTimeout(connectWebSocket, 3000);
+    socket.on('disconnect', (reason) => {
+      setConnected(false);
+      if (reason === 'io server disconnect') {
+        socket.connect();
       }
-    };
+    });
 
-    // Initialize connection
-    connectWebSocket();
+    socket.on('connect_error', (err) => {
+      setError('Connection error: ' + (err.message || 'Unknown error'));
+      setConnected(false);
+    });
 
-    // Cleanup function
-    return () => {
-      // Close WebSocket connection
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
+    socket.on('processing_start', () => {
+      setProcessing(true);
+      setResults([]);
+    });
+
+    socket.on('processing_update', (data) => {
+      setResults(prevResults => [...prevResults, data.chunk]);
+    });
+
+    socket.on('processing_complete', () => {
+      setProcessing(false);
+      processingRef.current = false;
       
-      // Clear any pending reconnect timeouts
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = null;
+      if (latestInputRef.current !== inputText && inputText) {
+        processLatestInput();
       }
+    });
+
+    socket.on('error', (data) => {
+      setError(data.message || 'Processing error');
+      setProcessing(false);
+      processingRef.current = false;
+    });
+
+    return () => {
+      clearTimeout(processingTimeoutRef.current);
+      socket.disconnect();
+      socketRef.current = null;
     };
   }, []);
 
-  // Send text for processing when inputText changes
+  // Process text with debounce
+  const processLatestInput = () => {
+    if (!connected || !socketRef.current || !inputText || processingRef.current) return;
+    
+    processingRef.current = true;
+    latestInputRef.current = inputText;
+    socketRef.current.emit('process_text', { text: inputText });
+  };
+
+  // Handle input text changes
   useEffect(() => {
-    if (connected && inputText && wsRef.current) {
-      // Only send if the connection is established
-      const message = {
-        type: 'process_text',
-        text: inputText
-      };
-      wsRef.current.send(JSON.stringify(message));
-    }
+    if (!connected || !socketRef.current || !inputText) return;
+    
+    latestInputRef.current = inputText;
+    clearTimeout(processingTimeoutRef.current);
+    
+    if (processingRef.current) return;
+    
+    processingTimeoutRef.current = setTimeout(() => {
+      processLatestInput();
+    }, 300);
+    
+    return () => clearTimeout(processingTimeoutRef.current);
   }, [connected, inputText]);
 
-  // Send audio for processing when audioBlob changes
+  // Handle audio blob changes
   useEffect(() => {
+    if (!connected || !audioBlob || !socketRef.current || processingRef.current) return;
+
     const processAudio = async () => {
-      if (connected && audioBlob && wsRef.current) {
-        try {
-          // Convert blob to base64 for sending via WebSocket
-          const reader = new FileReader();
-          reader.readAsDataURL(audioBlob);
+      try {
+        processingRef.current = true;
+        
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        
+        reader.onloadend = () => {
+          const base64data = reader.result.split(',')[1];
           
-          reader.onloadend = () => {
-            // Extract the base64 data (remove the data URL prefix)
-            const base64data = reader.result.split(',')[1];
-            
-            const message = {
-              type: 'process_audio',
-              audio_data: base64data,
-              format: audioBlob.type
-            };
-            
-            wsRef.current.send(JSON.stringify(message));
-          };
-        } catch (err) {
-          console.error('Error processing audio for WebSocket:', err);
-          setError('Failed to process audio for streaming');
-        }
+          socketRef.current.emit('process_audio', {
+            audio_data: base64data,
+            format: audioBlob.type
+          });
+        };
+      } catch (err) {
+        setError('Failed to process audio');
+        processingRef.current = false;
       }
     };
     
@@ -154,7 +134,7 @@ const WebSocketResult = ({ inputText, audioBlob }) => {
   return (
     <div className="mt-4 p-4 bg-gray-50 rounded-md border border-gray-200">
       <div className="flex items-center justify-between mb-2">
-        <h6 className="text-sm font-semibold">WebSocket Stream Results:</h6>
+        <h6 className="text-sm font-semibold">Real-time Results:</h6>
         <div className="flex items-center">
           {connected ? (
             <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
@@ -198,14 +178,14 @@ const WebSocketResult = ({ inputText, audioBlob }) => {
             </div>
           ) : (
             <div className="text-gray-400 italic">
-              {connected ? (processing ? 'Processing...' : 'Waiting for input...') : 'Connecting to server...'}
+              {connected ? (processing ? 'Processing...' : 'Waiting for input...') : 'Connecting...'}
             </div>
           )}
         </div>
       </div>
       
       <div className="mt-2 text-xs text-gray-500">
-        <span>WebSocket processing provides real-time streaming results</span>
+        <span>Real-time processing with Socket.IO</span>
       </div>
     </div>
   );
