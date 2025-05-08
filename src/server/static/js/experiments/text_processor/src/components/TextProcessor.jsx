@@ -20,7 +20,7 @@ import AudioRecorder from './AudioRecorder';
 
 const TextProcessor = ({ config }) => {
   const [text, setText] = useState(config.defaultText || '');
-  const [processedText, setProcessedText] = useState('');
+  const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [audioBlob, setAudioBlob] = useState(null);
@@ -40,7 +40,7 @@ const TextProcessor = ({ config }) => {
   const processText = useCallback(
     debounce(async (textToProcess) => {
       if (!textToProcess.trim()) {
-        setProcessedText('');
+        setResponse('');
         return;
       }
 
@@ -59,7 +59,7 @@ const TextProcessor = ({ config }) => {
         const data = await response.json();
 
         if (data.success) {
-          setProcessedText(data.result.processed_text);
+          setResponse(data.result.response || '');
         } else {
           setError(data.error || 'An error occurred while processing text');
         }
@@ -167,7 +167,7 @@ const TextProcessor = ({ config }) => {
           <div className="mb-4">
             <h6 className="text-sm font-semibold mb-2">HTTP Result:</h6>
             <ProcessedResult 
-              processedText={processedText}
+              response={response}
               isLoading={isLoading}
               error={error}
             />

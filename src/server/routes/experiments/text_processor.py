@@ -7,8 +7,9 @@ This module defines all routes for the Text Processor experiment.
 from flask import Blueprint, jsonify, render_template, request
 from flask_socketio import emit
 
-# Import the SocketIO instance (will be initialized in app.py)
+# Import the SocketIO instance and text processor
 from src.server.socketio_instance import socketio
+from src.text_processor.processor import process_text
 
 # Create a Blueprint for Text Processor routes with a URL prefix
 text_processor_bp = Blueprint(
@@ -17,24 +18,10 @@ text_processor_bp = Blueprint(
 
 # Experiment configuration parameters
 EXPERIMENT_CONFIG = {
-    "debounce_delay_ms": 1,  # Debounce delay in milliseconds
-    "default_text": "",  # Default text to show in the input area
-    "max_text_length": 5000,  # Maximum allowed text length
+    "debounce_delay_ms": 100,
+    "default_text": "",
+    "max_text_length": 5000,
 }
-
-
-def process_text_with_alternating_case(text):
-    """
-    Process text with alternating case (uppercase/lowercase words).
-    
-    Args:
-        text: The input text to process
-        
-    Returns:
-        A list of processed chunks (words with alternating case)
-    """
-    words = text.split()
-    return [word.upper() if i % 2 == 0 else word.lower() for i, word in enumerate(words)]
 
 
 @text_processor_bp.route("/", methods=["GET"])
@@ -46,7 +33,7 @@ def index():
 
 
 @text_processor_bp.route("/api/process", methods=["POST"])
-def process_text():
+def handle_process_text():
     """Process text for the Text Processor experiment."""
     data = request.json
 
@@ -54,9 +41,16 @@ def process_text():
         return jsonify({"error": "Text is required"}), 400
 
     try:
-        processed_chunks = process_text_with_alternating_case(data["text"])
-        processed_text = " ".join(processed_chunks)
-        return jsonify({"success": True, "result": {"processed_text": processed_text}})
+        # Process text returns string directly now
+        response_text = process_text(data["text"])
+        
+        # Simple response with a single field
+        return jsonify({
+            "success": True, 
+            "result": {
+                "response": response_text
+            }
+        })
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -98,13 +92,13 @@ def handle_process_text(data):
     try:
         emit('processing_start', {"status": "started"})
         
-        processed_chunks = process_text_with_alternating_case(text)
+        # Process text with session tracking - returns string directly now
+        response_text = process_text(text, session_id)
         
-        for chunk in processed_chunks:
-            emit('processing_update', {"chunk": chunk + " ", "session_id": session_id})
-            # Minimal delay to prevent UI freezing while still appearing real-time
-            socketio.sleep(0.01)  
-
+        # Send the complete response in one chunk instead of line by line
+        emit('processing_update', {"chunk": response_text})
+        
+        # Signal processing complete
         emit('processing_complete', {"status": "complete"})
 
     except Exception as e:
@@ -123,14 +117,15 @@ def handle_process_audio(data):
         emit('processing_start', {"status": "started"})
         
         # Demo transcription (would be replaced with actual API call)
-        demo_text = "THIS IS A SIMULATED TRANSCRIPTION OF AUDIO. THE ACTUAL IMPLEMENTATION WOULD USE A REAL SPEECH-TO-TEXT API."
-        processed_chunks = process_text_with_alternating_case(demo_text)
+        demo_text = "42"  # Use a number for our calculator
         
-        for chunk in processed_chunks:
-            emit('processing_update', {"chunk": chunk + " "})
-            # Minimal delay for realistic transcription appearance
-            socketio.sleep(0.05)
+        # Process text with session tracking - returns string directly now
+        response_text = process_text(demo_text, request.sid)
         
+        # Send the complete response in one chunk
+        emit('processing_update', {"chunk": response_text})
+        
+        # Signal processing complete
         emit('processing_complete', {"status": "complete"})
 
     except Exception as e:

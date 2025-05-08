@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 
 /**
- * WebSocketResult Component - Displays streaming results using Socket.IO
+ * WebSocketResult Component - Displays calculator results using Socket.IO
+ * Simplified to only show direct API responses
  */
 const WebSocketResult = ({ inputText, audioBlob }) => {
   const [connected, setConnected] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [results, setResults] = useState([]);
+  const [response, setResponse] = useState('');
   const [error, setError] = useState(null);
+  
   const socketRef = useRef(null);
   const processingRef = useRef(false);
   const latestInputRef = useRef('');
@@ -49,11 +51,11 @@ const WebSocketResult = ({ inputText, audioBlob }) => {
 
     socket.on('processing_start', () => {
       setProcessing(true);
-      setResults([]);
+      setResponse('');
     });
 
     socket.on('processing_update', (data) => {
-      setResults(prevResults => [...prevResults, data.chunk]);
+      setResponse(prev => prev + data.chunk);
     });
 
     socket.on('processing_complete', () => {
@@ -84,6 +86,8 @@ const WebSocketResult = ({ inputText, audioBlob }) => {
     
     processingRef.current = true;
     latestInputRef.current = inputText;
+    
+    // Send to server for processing
     socketRef.current.emit('process_text', { text: inputText });
   };
 
@@ -132,60 +136,32 @@ const WebSocketResult = ({ inputText, audioBlob }) => {
   }, [connected, audioBlob]);
 
   return (
-    <div className="mt-4 p-4 bg-gray-50 rounded-md border border-gray-200">
-      <div className="flex items-center justify-between mb-2">
-        <h6 className="text-sm font-semibold">Real-time Results:</h6>
-        <div className="flex items-center">
-          {connected ? (
-            <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-              <span className="h-2 w-2 mr-1 rounded-full bg-green-500"></span>
-              Connected
-            </span>
-          ) : (
-            <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
-              <span className="h-2 w-2 mr-1 rounded-full bg-red-500"></span>
-              Disconnected
-            </span>
-          )}
-        </div>
+    <div className="mt-4 p-4 bg-gray-50 rounded-md">
+      <div className="mb-2">
+        <span className="text-sm font-semibold">Socket.IO Result</span>
+        {!connected && <span className="ml-2 text-sm text-red-500">(Disconnected)</span>}
       </div>
       
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+        <div className="mb-4 p-2 bg-red-50 text-red-700 text-sm">
           {error}
         </div>
       )}
       
-      <div className="p-3 bg-white border border-gray-200 rounded-md min-h-[100px] relative">
-        {processing && (
-          <div className="absolute left-3 top-3">
-            <div className="flex items-center text-blue-500">
-              <div className="animate-pulse h-2 w-2 bg-blue-500 rounded-full mr-1"></div>
-              <div className="animate-pulse h-2 w-2 bg-blue-500 rounded-full mr-1 [animation-delay:0.2s]"></div>
-              <div className="animate-pulse h-2 w-2 bg-blue-500 rounded-full [animation-delay:0.4s]"></div>
-            </div>
+      <div className="bg-white border border-gray-200 rounded-md p-3 min-h-[100px] font-mono">
+        {processing ? (
+          <div className="text-gray-500">
+            Processing...
+          </div>
+        ) : response ? (
+          <div className="whitespace-pre-wrap text-green-600">
+            {response}
+          </div>
+        ) : (
+          <div className="text-gray-400 italic">
+            Enter a number to start calculating...
           </div>
         )}
-        
-        <div className={`${processing ? 'mt-6' : ''}`}>
-          {results.length > 0 ? (
-            <div>
-              {results.map((chunk, index) => (
-                <span key={index} className={index === results.length - 1 && processing ? 'animate-pulse' : ''}>
-                  {chunk}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <div className="text-gray-400 italic">
-              {connected ? (processing ? 'Processing...' : 'Waiting for input...') : 'Connecting...'}
-            </div>
-          )}
-        </div>
-      </div>
-      
-      <div className="mt-2 text-xs text-gray-500">
-        <span>Real-time processing with Socket.IO</span>
       </div>
     </div>
   );
