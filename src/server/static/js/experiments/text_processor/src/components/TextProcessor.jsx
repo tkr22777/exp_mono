@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import TextInput from './TextInput';
 import ProcessedResult from './ProcessedResult';
+import WebSocketResult from './WebSocketResult';
 import AudioRecorder from './AudioRecorder';
 
 /**
@@ -24,6 +25,7 @@ const TextProcessor = ({ config }) => {
   const [error, setError] = useState(null);
   const [audioBlob, setAudioBlob] = useState(null);
   const [transcribingAudio, setTranscribingAudio] = useState(false);
+  const [showWebSocketResults, setShowWebSocketResults] = useState(true);
 
   // Debounce function to limit API calls
   const debounce = (func, wait) => {
@@ -103,6 +105,11 @@ const TextProcessor = ({ config }) => {
     }, 2000);
   };
 
+  // Toggle between showing/hiding WebSocket results
+  const toggleWebSocketResults = () => {
+    setShowWebSocketResults(!showWebSocketResults);
+  };
+
   // Process default text on initial load if provided
   useEffect(() => {
     if (config.defaultText) {
@@ -140,11 +147,39 @@ const TextProcessor = ({ config }) => {
             </div>
           )}
 
-          <ProcessedResult 
-            processedText={processedText}
-            isLoading={isLoading}
-            error={error}
-          />
+          <div className="mb-4">
+            <div className="flex items-center justify-between">
+              <h6 className="text-sm font-semibold mb-2">Processing Results:</h6>
+              
+              <div className="flex space-x-2">
+                <button 
+                  onClick={toggleWebSocketResults}
+                  className={`px-2 py-1 text-xs font-medium rounded 
+                    ${showWebSocketResults ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+                >
+                  {showWebSocketResults ? 'Hide WebSocket Results' : 'Show WebSocket Results'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Traditional HTTP Result */}
+          <div className="mb-4">
+            <h6 className="text-sm font-semibold mb-2">HTTP Result:</h6>
+            <ProcessedResult 
+              processedText={processedText}
+              isLoading={isLoading}
+              error={error}
+            />
+          </div>
+
+          {/* WebSocket Result */}
+          {showWebSocketResults && (
+            <WebSocketResult 
+              inputText={text}
+              audioBlob={audioBlob}
+            />
+          )}
 
           <div className="mt-4">
             <span className="text-xs text-gray-500">Processing delay: {config.debounceDelayMs}ms</span>
