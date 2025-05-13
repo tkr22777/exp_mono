@@ -8,8 +8,8 @@ from typing import Dict, Any, Tuple, List, Optional
 
 from flask import Blueprint, Response, jsonify, render_template, request
 
-from src.langchain_agent.api import process_with_langchain
-from src.langchain_agent.persistence.api import (
+from src.modules.langchain_agent.api import (
+    process_with_langchain,
     create_persistent_agent,
     get_decision_chain,
     get_recent_chains,
