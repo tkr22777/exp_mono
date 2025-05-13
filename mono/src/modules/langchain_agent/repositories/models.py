@@ -27,9 +27,10 @@ class ChainModel(Base):
     context = Column(Text, nullable=False)
     final_decision = Column(Text, nullable=True)
     status = Column(String(20), nullable=False, default="in_progress")
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.UTC))
     updated_at = Column(
-        DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
+        DateTime, default=lambda: datetime.datetime.now(datetime.UTC), 
+        onupdate=lambda: datetime.datetime.now(datetime.UTC)
     )
 
     # Relationship with steps
@@ -89,7 +90,7 @@ class StepModel(Base):
     decision = Column(Text, nullable=False)
     next_actions = Column(Text, nullable=False)  # Stored as JSON
     meta_data = Column(Text, nullable=False)  # Stored as JSON (renamed from metadata)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.UTC))
 
     # Relationship with chain
     chain = relationship("ChainModel", back_populates="steps")
