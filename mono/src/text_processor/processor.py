@@ -10,7 +10,7 @@ The implementation demonstrates a simple conversational workflow where:
 import json
 from typing import Dict, List, Optional, Tuple
 
-from src.llms import default_client
+from src.modules.llms.ai_client import default_client
 
 # Session state to track conversation history
 # Structure: {session_id: {"last_response": "assistant response", "history": [messages]}}

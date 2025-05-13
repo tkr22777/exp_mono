@@ -10,7 +10,7 @@ import os
 import pytest
 from openai import OpenAI
 
-from src.llms.ai_client import default_client
+from src.modules.llms.ai_client import default_client
 from src.utils.settings import settings
 
 

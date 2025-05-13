@@ -17,7 +17,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
-from src.llms.ai_client import default_client
+from src.modules.llms.ai_client import default_client
 from src.utils.settings import settings
 
 

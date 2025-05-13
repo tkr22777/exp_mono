@@ -62,7 +62,7 @@ def test_create_decision_chain(agent_with_mock_llm, monkeypatch):
     """Test creating a decision chain."""
     # Mock the title generation
     monkeypatch.setattr(
-        "src.llms.ai_client.default_client.generate_response",
+        "src.modules.llms.ai_client.default_client.generate_response",
         lambda _: "Generated Title",
     )
 
@@ -128,7 +128,7 @@ def test_process_text(agent_with_mock_llm, monkeypatch):
     """Test processing text through the decision chain."""
     # Mock the title generation
     monkeypatch.setattr(
-        "src.llms.ai_client.default_client.generate_response",
+        "src.modules.llms.ai_client.default_client.generate_response",
         lambda _: "Generated Title",
     )
 
