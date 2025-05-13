@@ -10,6 +10,7 @@ Workflow and verification:
 - Always incrementally add small, non‑breaking changes and test them.
 - Do not add extra code as part of the core functionality. If needed, test a functionality by running the server and triggering the execution path.
 - If automated tests help, place them under tests/ (not required for this project) or add them to the codebase.
+- Do not test very simple things like object instantiation, only test business logic.
 - If you are very confident after making a changed that is verfied working without any regression, you can try creating a git commit to update those changes.
 
 Remember the following specifications and structural guidelines:
