@@ -8,10 +8,13 @@ from typing import Dict, Any, Tuple, Union, cast
 
 from flask import Blueprint, Response, jsonify, render_template, request
 from flask_socketio import emit, request as socketio_request
+from pydantic import ValidationError
 
 # Import the SocketIO instance and text processor
 from src.server.socketio_instance import socketio
 from src.modules.text_processor.processor import process_text
+from src.modules.text_processor.models.api import TextProcessRequest, TextProcessResponse
+from src.modules.text_processor.models.domain import ProcessingResult
 
 # Create a Blueprint for Text Processor routes with a URL prefix
 text_processor_bp = Blueprint(
@@ -39,18 +42,26 @@ def handle_process_text() -> Tuple[Response, int]:
     """Process text for the Text Processor experiment."""
     data = request.json
 
-    if not data or "text" not in data:
-        return jsonify({"error": "Text is required"}), 400
+    if not data:
+        return jsonify({"error": "Invalid request"}), 400
 
     try:
-        # Process text returns string directly now
-        response_text = process_text(data["text"])
-
-        # Simple response with a single field
-        return jsonify({"success": True, "result": {"response": response_text}}), 200
-
+        # Convert to request model
+        req = TextProcessRequest(**data)
+        
+        # Process text
+        response_text = process_text(req.text, req.session_id)
+        
+        # Create result and response
+        result = ProcessingResult(response=response_text, session_id=req.session_id)
+        response = TextProcessResponse.from_result(result)
+        
+        # Return response
+        return jsonify(response.dict()), 200
+    except ValidationError as e:
+        return jsonify(TextProcessResponse.from_error(str(e)).dict()), 400
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify(TextProcessResponse.from_error(str(e)).dict()), 500
 
 
 # Socket.IO event handlers
@@ -89,7 +100,7 @@ def handle_process_text_socket(data: Dict[str, Any]) -> None:
     try:
         emit("processing_start", {"status": "started"})
 
-        # Process text with session tracking - returns string directly now
+        # Process text with session tracking
         response_text = process_text(text, session_id)
 
         # Send the complete response in one chunk instead of line by line
@@ -116,7 +127,7 @@ def handle_process_audio(data: Dict[str, Any]) -> None:
         # Demo transcription (would be replaced with actual API call)
         demo_text = "42"  # Use a number for our calculator
 
-        # Process text with session tracking - returns string directly now
+        # Process text with session tracking
         response_text = process_text(demo_text, socketio_request.sid)
 
         # Send the complete response in one chunk
