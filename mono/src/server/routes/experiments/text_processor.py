@@ -9,7 +9,7 @@ from flask_socketio import emit
 
 # Import the SocketIO instance and text processor
 from src.server.socketio_instance import socketio
-from src.text_processor.processor import process_text
+from src.modules.text_processor.processor import process_text
 
 # Create a Blueprint for Text Processor routes with a URL prefix
 text_processor_bp = Blueprint(

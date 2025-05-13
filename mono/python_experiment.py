@@ -13,18 +13,18 @@ from typing import Optional
 
 import click
 
-from src.langchain_agent.api import (
+from src.modules.langchain_agent.api import (
     DecisionChain,
     LangChainDecisionResult,
     process_with_langchain,
 )
-from src.langchain_agent.persistence.api import (
+from src.modules.langchain_agent.persistence.api import (
     PersistentLangChainAgent,
     create_persistent_agent,
     get_recent_chains,
 )
-from src.planner.plan_creator import ProcessingPlan
-from src.text_processor import ProcessingResult, process_text
+from src.modules.planner.plan_creator import ProcessingPlan
+from src.modules.text_processor.processor import ProcessingResult, process_text
 
 
 def display_plan(plan: ProcessingPlan) -> None:

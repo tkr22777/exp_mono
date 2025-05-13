@@ -134,25 +134,6 @@ GET /api/chains?limit=10  // limit is optional, default: 10
 GET /api/chains/{chain_id}
 ```
 
-## Project Structure
-
-- `python_experiment.py`: Main CLI application
-- `src/`: Source code directory
-  - `text_processor.py`: Core text processing functionality
-  - `planner/`: Planning functionality
-  - `llms/`: LLM client implementations
-  - `langchain_agent/`: LangChain decision-making agent
-    - `agent.py`: Core agent implementation
-    - `api.py`: API for using the agent
-    - `persistence/`: Database persistence functionality
-      - `models.py`: SQLAlchemy database models
-      - `database.py`: Database session management
-      - `api.py`: API for persistence operations
-  - `server/`: Web server implementation
-    - `app.py`: Flask application with command-line interface
-    - `templates/`: HTML templates
-    - `static/`: Static assets (CSS, JS, images)
-
 ## LangChain Agent Module
 
 The LangChain Agent module implements a decision-making agent using LangChain with the following components:
