@@ -1,7 +1,5 @@
 """
-Flask Application
-
-This module defines the Flask application for serving HTML and APIs.
+Flask Application with Socket.IO support for real-time communication.
 """
 import argparse
 import logging
@@ -19,17 +17,10 @@ from src.server.routes.experiments.audio_processor import audio_processor_bp
 # Import SocketIO instance
 from src.server.socketio_instance import init_socketio, socketio
 
-# Configure logging
 def setup_logging(debug: bool = False) -> None:
-    """
-    Configure logging for the application.
-    
-    Args:
-        debug: Whether to enable debug logging
-    """
+    """Configure hierarchical logging with console output."""
     log_level = logging.DEBUG if debug else logging.INFO
     
-    # Basic configuration
     logging_config: Dict[str, Any] = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -60,16 +51,11 @@ def setup_logging(debug: bool = False) -> None:
         }
     }
     
-    # Apply configuration
     logging.config.dictConfig(logging_config)
 
 # Initialize Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
-
-# Enable CORS for all routes
 CORS(app)
-
-# Initialize SocketIO with the app
 init_socketio(app)
 
 # Register blueprints
@@ -80,49 +66,26 @@ app.register_blueprint(audio_processor_bp)
 
 
 def create_app(debug: bool = False) -> Flask:
-    """
-    Create and configure the Flask application.
-
-    Args:
-        debug: Whether to enable debug mode
-        
-    Returns:
-        Configured Flask application
-    """
-    # Set up logging
+    """Factory function for creating the Flask application."""
     setup_logging(debug)
-    
-    # Configure Flask app
     app.debug = debug
-    
     return app
 
 
 def run_server(host: str = "0.0.0.0", port: int = 5000, debug: bool = False) -> None:
-    """
-    Run the Flask server with SocketIO support.
-
-    Args:
-        host: Host to bind the server to
-        port: Port to bind the server to
-        debug: Whether to run in debug mode
-    """
-    # Set up logging
+    """Run the server with Socket.IO support instead of standard Flask server."""
     setup_logging(debug)
-    
-    # Configure Flask app
     app.debug = debug
     
-    # Log startup information
     logger = logging.getLogger(__name__)
     logger.info(f"Starting server on {host}:{port} with debug={debug}")
     
-    # Run with SocketIO instead of app.run()
+    # Use socketio.run instead of app.run
     socketio.run(app, host=host, port=port, debug=debug)
 
 
 def main() -> None:
-    """Parse command line arguments and start the server."""
+    """Entry point with command line argument parsing."""
     parser = argparse.ArgumentParser(description="Start the Flask server")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind to")
     parser.add_argument("--port", type=int, default=5000, help="Port to bind to")
@@ -131,11 +94,8 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-
-    # Run the server with command line arguments
     run_server(host=args.host, port=args.port, debug=args.debug)
 
 
 if __name__ == "__main__":
-    # Run the server with command line arguments
     main()
