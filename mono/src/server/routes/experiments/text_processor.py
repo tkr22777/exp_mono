@@ -4,8 +4,10 @@ Text Processor Routes
 This module defines all routes for the Text Processor experiment.
 """
 
-from flask import Blueprint, jsonify, render_template, request
-from flask_socketio import emit
+from typing import Dict, Any, Tuple, Union, cast
+
+from flask import Blueprint, Response, jsonify, render_template, request
+from flask_socketio import emit, request as socketio_request
 
 # Import the SocketIO instance and text processor
 from src.server.socketio_instance import socketio
@@ -17,7 +19,7 @@ text_processor_bp = Blueprint(
 )
 
 # Experiment configuration parameters
-EXPERIMENT_CONFIG = {
+EXPERIMENT_CONFIG: Dict[str, Any] = {
     "debounce_delay_ms": 100,
     "default_text": "",
     "max_text_length": 5000,
@@ -25,7 +27,7 @@ EXPERIMENT_CONFIG = {
 
 
 @text_processor_bp.route("/", methods=["GET"])
-def index():
+def index() -> str:
     """Serve the Text Processor experiment page."""
     return render_template(
         "experiments/text_processor/index.html", config=EXPERIMENT_CONFIG
@@ -33,7 +35,7 @@ def index():
 
 
 @text_processor_bp.route("/api/process", methods=["POST"])
-def handle_process_text():
+def handle_process_text() -> Tuple[Response, int]:
     """Process text for the Text Processor experiment."""
     data = request.json
 
@@ -45,7 +47,7 @@ def handle_process_text():
         response_text = process_text(data["text"])
 
         # Simple response with a single field
-        return jsonify({"success": True, "result": {"response": response_text}})
+        return jsonify({"success": True, "result": {"response": response_text}}), 200
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -53,20 +55,20 @@ def handle_process_text():
 
 # Socket.IO event handlers
 @socketio.on("connect")
-def handle_connect():
+def handle_connect() -> None:
     """Handle client connection."""
     print("Client connected to Socket.IO")
     emit("message", {"data": "Connected to server"})
 
 
 @socketio.on("disconnect")
-def handle_disconnect():
+def handle_disconnect() -> None:
     """Handle client disconnection."""
     print("Client disconnected from Socket.IO")
 
 
 @socketio.on("join")
-def on_join(data):
+def on_join(data: Dict[str, Any]) -> None:
     """Handle client joining a namespace."""
     namespace = data.get("namespace", "")
     print(f"Client joining namespace: {namespace}")
@@ -74,14 +76,14 @@ def on_join(data):
 
 
 @socketio.on("process_text")
-def handle_process_text(data):
+def handle_process_text_socket(data: Dict[str, Any]) -> None:
     """Process text via Socket.IO and stream results."""
     if not data or "text" not in data:
         emit("error", {"message": "Text is required"})
         return
 
     text = data["text"]
-    session_id = request.sid
+    session_id = socketio_request.sid
     print(f"Processing text for session: {session_id}")
 
     try:
@@ -102,7 +104,7 @@ def handle_process_text(data):
 
 
 @socketio.on("process_audio")
-def handle_process_audio(data):
+def handle_process_audio(data: Dict[str, Any]) -> None:
     """Process audio via Socket.IO and stream results."""
     if not data or "audio_data" not in data:
         emit("error", {"message": "Audio data is required"})
@@ -115,7 +117,7 @@ def handle_process_audio(data):
         demo_text = "42"  # Use a number for our calculator
 
         # Process text with session tracking - returns string directly now
-        response_text = process_text(demo_text, request.sid)
+        response_text = process_text(demo_text, socketio_request.sid)
 
         # Send the complete response in one chunk
         emit("processing_update", {"chunk": response_text})

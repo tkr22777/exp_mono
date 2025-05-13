@@ -4,6 +4,7 @@ Flask Application
 This module defines the Flask application for serving HTML and APIs.
 """
 import argparse
+from typing import NoReturn
 
 from flask import Flask
 from flask_cors import CORS
@@ -64,7 +65,7 @@ def run_server(host: str = "0.0.0.0", port: int = 5000, debug: bool = False) -> 
     socketio.run(app, host=host, port=port, debug=debug)
 
 
-def main():
+def main() -> None:
     """Parse command line arguments and start the server."""
     parser = argparse.ArgumentParser(description="Start the Flask server")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind to")

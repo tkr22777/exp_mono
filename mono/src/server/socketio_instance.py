@@ -4,6 +4,7 @@ SocketIO Instance
 This module creates and exports a Flask-SocketIO instance that can be shared across the application.
 """
 
+from flask import Flask
 from flask_socketio import SocketIO
 
 # Create the SocketIO instance
@@ -12,7 +13,7 @@ from flask_socketio import SocketIO
 socketio = SocketIO(cors_allowed_origins="*", async_mode=None)
 
 
-def init_socketio(app):
+def init_socketio(app: Flask) -> SocketIO:
     """
     Initialize SocketIO with the Flask app.
 

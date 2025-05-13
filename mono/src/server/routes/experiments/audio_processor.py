@@ -4,7 +4,9 @@ Audio Processor Routes
 This module will contain routes for audio processing functionality.
 """
 
-from flask import Blueprint, jsonify, render_template, request
+from typing import Dict, Any, Tuple
+
+from flask import Blueprint, Response, jsonify, render_template, request
 
 # Create a Blueprint for Audio Processor routes with a URL prefix
 audio_processor_bp = Blueprint(
@@ -13,14 +15,14 @@ audio_processor_bp = Blueprint(
 
 
 @audio_processor_bp.route("/", methods=["GET"])
-def index():
+def index() -> str:
     """Serve the Audio Processor experiment page."""
     # TODO: Create template for audio processor or integrate with text processor
     return render_template("experiments/text_processor/index.html")
 
 
 @audio_processor_bp.route("/api/transcribe", methods=["POST"])
-def transcribe_audio():
+def transcribe_audio() -> Tuple[Response, int]:
     """
     Transcribe audio file to text.
 
@@ -48,11 +50,11 @@ def transcribe_audio():
                 "confidence": 0.0,
             },
         }
-    )
+    ), 200
 
 
 @audio_processor_bp.route("/api/process-audio", methods=["POST"])
-def process_audio():
+def process_audio() -> Tuple[Response, int]:
     """
     Process audio file directly with a multimodal AI model.
 
@@ -80,4 +82,4 @@ def process_audio():
                 "processing_time_ms": 0,
             },
         }
-    )
+    ), 200

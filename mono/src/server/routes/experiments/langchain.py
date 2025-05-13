@@ -4,7 +4,9 @@ LangChain Decision Agent Routes
 This module defines all routes for the LangChain Decision Agent experiment.
 """
 
-from flask import Blueprint, jsonify, render_template, request
+from typing import Dict, Any, Tuple, List, Optional
+
+from flask import Blueprint, Response, jsonify, render_template, request
 
 from src.langchain_agent.api import process_with_langchain
 from src.langchain_agent.persistence.api import (
@@ -20,13 +22,13 @@ langchain_bp = Blueprint(
 
 
 @langchain_bp.route("/", methods=["GET"])
-def index():
+def index() -> str:
     """Serve the LangChain Decision Agent experiment page."""
     return render_template("experiments/langchain/index.html")
 
 
 @langchain_bp.route("/api/process", methods=["POST"])
-def process_text():
+def process_text() -> Tuple[Response, int]:
     """Process text using the LangChain agent."""
     data = request.json
 
@@ -86,14 +88,14 @@ def process_text():
                 },
             }
 
-        return jsonify(response)
+        return jsonify(response), 200
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
 
 @langchain_bp.route("/api/chains", methods=["GET"])
-def get_chains():
+def get_chains() -> Tuple[Response, int]:
     """Get recent decision chains for LangChain experiment."""
     try:
         # Get limit parameter or default to 10
@@ -117,14 +119,14 @@ def get_chains():
             ],
         }
 
-        return jsonify(response)
+        return jsonify(response), 200
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
 
 @langchain_bp.route("/api/chains/<chain_id>", methods=["GET"])
-def get_chain(chain_id):
+def get_chain(chain_id: str) -> Tuple[Response, int]:
     """Get a specific decision chain by ID for LangChain experiment."""
     try:
         # Get chain
@@ -155,7 +157,7 @@ def get_chain(chain_id):
             },
         }
 
-        return jsonify(response)
+        return jsonify(response), 200
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

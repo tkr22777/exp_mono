@@ -3,6 +3,7 @@ Remeber the following as you write code:
 - You are responsible for the code quality of the software.
 - You are responsible for the code organization and readability of the software.
 - Make sure to make small, incremental changes and verify them through terminal commands.
+- While verifying, add multiple commands together to that it takes one shot to verify all of the functionality. Add delay between dependent commands.
 - Always make sure to incrementally add small non-breaking changes and test them.
 - Do not add any extra code as part of the core functionality. If needed, test a functionality but running the server and triggering the execution path. If testing could be helpful add automated tests under the test directory (not required for this project) or add them to the codebase.
 
