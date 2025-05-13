@@ -11,15 +11,16 @@ from flask_socketio import SocketIO
 # async_mode="gevent" is recommended for production
 socketio = SocketIO(cors_allowed_origins="*", async_mode=None)
 
+
 def init_socketio(app):
     """
     Initialize SocketIO with the Flask app.
-    
+
     Args:
         app: The Flask application instance
-    
+
     Returns:
         The initialized SocketIO instance
     """
     socketio.init_app(app)
-    return socketio 
+    return socketio

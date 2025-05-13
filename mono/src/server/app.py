@@ -3,17 +3,21 @@ Flask Application
 
 This module defines the Flask application for serving HTML and APIs.
 """
+import argparse
+
 from flask import Flask
 from flask_cors import CORS
+
+# Import blueprints
+from src.server.routes import langchain_bp, main_bp, text_processor_bp
 
 # Import SocketIO instance
 from src.server.socketio_instance import init_socketio, socketio
 
-# Import blueprints
-from src.server.routes import langchain_bp, main_bp, text_processor_bp
 # Import audio processor blueprint if available
 try:
     from src.server.routes.experiments.audio_processor import audio_processor_bp
+
     has_audio_processor = True
 except ImportError:
     has_audio_processor = False
@@ -60,6 +64,21 @@ def run_server(host: str = "0.0.0.0", port: int = 5000, debug: bool = False) -> 
     socketio.run(app, host=host, port=port, debug=debug)
 
 
+def main():
+    """Parse command line arguments and start the server."""
+    parser = argparse.ArgumentParser(description="Start the Flask server")
+    parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind to")
+    parser.add_argument("--port", type=int, default=5000, help="Port to bind to")
+    parser.add_argument(
+        "--debug", action="store_true", help="Whether to run in debug mode"
+    )
+
+    args = parser.parse_args()
+
+    print(f"Starting server on {args.host}:{args.port} with debug={args.debug}")
+    run_server(host=args.host, port=args.port, debug=args.debug)
+
+
 if __name__ == "__main__":
-    # Run the server directly if this file is executed
-    run_server(debug=True)
+    # Run the server with command line arguments
+    main()

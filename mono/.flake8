@@ -9,5 +9,4 @@ per-file-ignores =
     tests/*: F401,E501
     tests/langchain_agent/persistence/test_database.py: F401,F811,E501
     tests/conftest.py: F401,F811,E501
-    python_experiment.py: F401,F541
-    src/server/cli.py: F401 
+    python_experiment.py: F401,F541 

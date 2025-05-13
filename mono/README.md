@@ -137,7 +137,6 @@ GET /api/chains/{chain_id}
 ## Project Structure
 
 - `python_experiment.py`: Main CLI application
-- `server.py`: Web server entry point
 - `src/`: Source code directory
   - `text_processor.py`: Core text processing functionality
   - `planner/`: Planning functionality
@@ -150,8 +149,7 @@ GET /api/chains/{chain_id}
       - `database.py`: Database session management
       - `api.py`: API for persistence operations
   - `server/`: Web server implementation
-    - `app.py`: Flask application
-    - `cli.py`: Command-line interface for the server
+    - `app.py`: Flask application with command-line interface
     - `templates/`: HTML templates
     - `static/`: Static assets (CSS, JS, images)
 

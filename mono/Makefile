@@ -120,7 +120,7 @@ serve: install
 # Run the web server (development mode)
 serve-dev: install
 	@echo "Starting development web server on $(HOST):$(PORT)..."
-	@poetry run python server.py --host $(HOST) --port $(PORT) --debug || echo "❌ Server failed to start"
+	@poetry run python -m src.server.app --host $(HOST) --port $(PORT) --debug || echo "❌ Server failed to start"
 
 # Build UI components (production mode)
 build-ui: build-css

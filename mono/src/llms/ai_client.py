@@ -18,6 +18,7 @@ if settings.GEMINI_API_KEY:
 # Define Message type for clarity
 Message = Dict[str, str]  # Contains 'role' and 'content' keys
 
+
 class AIClient:
     """Client for interacting with external AI models."""
 
@@ -52,10 +53,10 @@ class AIClient:
         self.temperature = settings.TEMPERATURE
 
     def generate_response(
-        self, 
-        prompt: Optional[str] = None, 
-        messages: Optional[List[Message]] = None, 
-        max_tokens: Optional[int] = None
+        self,
+        prompt: Optional[str] = None,
+        messages: Optional[List[Message]] = None,
+        max_tokens: Optional[int] = None,
     ) -> str:
         """
         Generate a response from the AI model based on the given prompt or messages.
@@ -73,17 +74,21 @@ class AIClient:
             if messages is None:
                 if prompt is None:
                     raise ValueError("Either prompt or messages must be provided")
-                
+
                 # Use default system message with prompt
                 messages = [
                     {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": prompt},
                 ]
             else:
                 # If no system message is included, add the default one
-                has_system_message = any(msg.get("role") == "system" for msg in messages)
+                has_system_message = any(
+                    msg.get("role") == "system" for msg in messages
+                )
                 if not has_system_message:
-                    messages.insert(0, {"role": "system", "content": "You are a helpful assistant."})
+                    messages.insert(
+                        0, {"role": "system", "content": "You are a helpful assistant."}
+                    )
 
             response = self.client.chat.completions.create(
                 model=self.model_name,
