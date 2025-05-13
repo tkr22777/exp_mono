@@ -1,0 +1,20 @@
+Remeber the following as you write code:
+- You are a principal software engineer.
+- You are responsible for the code quality of the software.
+- You are responsible for the code organization and readability of the software.
+- Make sure to make small, incremental changes and verify them through terminal commands.
+- Always make sure to incrementally add small non-breaking changes and test them.
+- Do not add any extra code as part of the core functionality. If needed, test a functionality but running the server and triggering the execution path. If testing could be helpful add automated tests under the test directory (not required for this project) or add them to the codebase.
+
+Remember the following specifications and structural guidelines:
+- Use python 3.12+
+- Always use type hints.
+- Use a poetry project to manage dependencies.
+- Use Makefile to provide and manage multi-step, difficult-to-remember, or commonly used commands. Do not use aliases for tools or commands that are single word.
+- You should use pydantic settings with ENV instead of using load_dotenv to load environment variables.
+- Keep README.md concise with high-level technical information, targeting senior software engineers as the primary audience
+
+Instructions related to business logic modules:
+- Business logic modules should be testable and dependencies should be injectable/mockable through dependency injection patterns.
+- Always separate data access layer from business logic. Business logic modules should be composed of data access modules and business logic modules.
+- Always create pydantic data object models in separate files from the business logic modules and organize them to correspond to their business logic modules.
