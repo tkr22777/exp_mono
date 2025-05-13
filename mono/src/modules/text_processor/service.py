@@ -7,7 +7,7 @@ This module contains the business logic for text processing.
 import json
 from typing import List, Optional, Dict, Any, cast
 
-from src.data.repositories.interfaces import SessionRepository
+from src.modules.text_processor.repositories.interfaces import SessionRepository
 from src.modules.llms.ai_client import AIClient, Message
 from src.modules.text_processor.models.domain import ProcessingResult, SessionState, Message as DomainMessage
 

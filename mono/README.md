@@ -75,12 +75,25 @@ chain, chain_id = agent.process_text_with_persistence("Your text")
 - SQLite implementation is in `src/modules/langchain_agent/repositories/sqlite_repository.py`
 - SQLAlchemy models are in `src/modules/langchain_agent/repositories/models.py`
 
+The Text Processor module follows a similar structure:
+- Business logic is in `src/modules/text_processor/service.py`
+- Domain models are in `src/modules/text_processor/models/domain.py`
+- API models are in `src/modules/text_processor/models/api.py`
+- Repository interfaces are in `src/modules/text_processor/repositories/interfaces.py`
+- In-memory implementation is in `src/modules/text_processor/repositories/memory_repositories.py`
+
 ### Migration Status
 The LangChain Agent module has been successfully migrated from `src/langchain_agent` to `src/modules/langchain_agent`.
 
 - ✅ All imports in the main codebase have been updated
 - ✅ The module structure follows best practices for separating business logic from infrastructure
 - ✅ The module is working correctly in the application
+- ✅ All tests are passing
+
+The Text Processor repositories have been migrated from `src/data/repositories` to `src/modules/text_processor/repositories`.
+
+- ✅ Backward compatibility is maintained for existing code
+- ✅ The module structure is consistent with other modules
 - ✅ All tests are passing
 
 ### Known Issues

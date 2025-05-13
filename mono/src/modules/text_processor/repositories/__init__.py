@@ -1,13 +1,13 @@
 """
-Repository Module
+Text Processor Repository Module
 
 This module provides factory functions for creating repositories.
 """
 
-from src.data.repositories.interfaces import SessionRepository
-from src.data.repositories.memory_repositories import InMemorySessionRepository
+from src.modules.text_processor.repositories.interfaces import SessionRepository
+from src.modules.text_processor.repositories.memory_repositories import InMemorySessionRepository
 
-# Singleton instances
+# Singleton instance
 _session_repository: SessionRepository = InMemorySessionRepository()
 
 
