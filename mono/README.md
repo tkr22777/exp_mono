@@ -2,6 +2,11 @@
 
 Text processing system with LangChain-based decision making, CLI and web interfaces.
 
+## Requirements
+
+- Python 3.12+
+- Poetry for dependency management
+
 ## Core Components
 
 - Text processor with planning and execution steps
@@ -13,6 +18,9 @@ Text processing system with LangChain-based decision making, CLI and web interfa
 ## Setup
 
 ```bash
+# Ensure Python 3.12+ is installed
+python --version
+
 # Install dependencies
 poetry install
 
@@ -99,6 +107,12 @@ The Text Processor repositories have been migrated from `src/data/repositories` 
 ### Known Issues
 - Some type errors are still present but are being ignored via mypy.ini configuration
 - The test suite has been updated to match the new module structure
+
+### Recent Updates
+- ✅ Upgraded to Python 3.12+ compatibility
+- ✅ Improved logging system with proper configuration
+- ✅ Enhanced test structure for all modules
+- ✅ Stricter type checking with mypy
 
 ## License
 
