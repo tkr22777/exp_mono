@@ -28,3 +28,7 @@ Instructions related to business logic modules:
 - Separate the data‑access layer from business logic. A (business) logic module should compose (instead of inherit) data‑access modules and other business‑logic modules.
 - Create Pydantic data models in separate files and organize them alongside their corresponding business logic. When models are shared between business logic and data access layers, use a single definition to avoid duplication.
 - For codes that can be reused, create stateless utility functions that are independent of self-hosted infrastructure and don't modify system state.
+
+Code import and structure rules:
+- Do not use optional imports with try-except blocks. All modules should be directly imported. If a feature is incomplete, use stub implementations with TODO comments rather than conditional imports.
+- At any given time, the source code should not have conditional imports or optional feature flags based on import availability.

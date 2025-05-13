@@ -14,17 +14,10 @@ from flask_cors import CORS
 
 # Import blueprints
 from src.server.routes import langchain_bp, main_bp, text_processor_bp
+from src.server.routes.experiments.audio_processor import audio_processor_bp
 
 # Import SocketIO instance
 from src.server.socketio_instance import init_socketio, socketio
-
-# Import audio processor blueprint if available
-try:
-    from src.server.routes.experiments.audio_processor import audio_processor_bp
-
-    has_audio_processor = True
-except ImportError:
-    has_audio_processor = False
 
 # Configure logging
 def setup_logging(debug: bool = False) -> None:
@@ -83,10 +76,7 @@ init_socketio(app)
 app.register_blueprint(main_bp)
 app.register_blueprint(langchain_bp)
 app.register_blueprint(text_processor_bp)
-
-# Register audio processor blueprint if available
-if has_audio_processor:
-    app.register_blueprint(audio_processor_bp)
+app.register_blueprint(audio_processor_bp)
 
 
 def create_app(debug: bool = False) -> Flask:
