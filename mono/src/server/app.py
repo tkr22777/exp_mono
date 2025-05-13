@@ -4,7 +4,10 @@ Flask Application
 This module defines the Flask application for serving HTML and APIs.
 """
 import argparse
-from typing import NoReturn
+import logging
+import logging.config
+import os
+from typing import NoReturn, Dict, Any
 
 from flask import Flask
 from flask_cors import CORS
@@ -22,6 +25,50 @@ try:
     has_audio_processor = True
 except ImportError:
     has_audio_processor = False
+
+# Configure logging
+def setup_logging(debug: bool = False) -> None:
+    """
+    Configure logging for the application.
+    
+    Args:
+        debug: Whether to enable debug logging
+    """
+    log_level = logging.DEBUG if debug else logging.INFO
+    
+    # Basic configuration
+    logging_config: Dict[str, Any] = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'standard': {
+                'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            },
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'level': log_level,
+                'formatter': 'standard',
+                'stream': 'ext://sys.stdout',
+            },
+        },
+        'loggers': {
+            '': {  # root logger
+                'handlers': ['console'],
+                'level': log_level,
+                'propagate': True
+            },
+            'src': {
+                'handlers': ['console'],
+                'level': log_level,
+                'propagate': False
+            },
+        }
+    }
+    
+    # Apply configuration
+    logging.config.dictConfig(logging_config)
 
 # Initialize Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
@@ -42,13 +89,22 @@ if has_audio_processor:
     app.register_blueprint(audio_processor_bp)
 
 
-def create_app() -> Flask:
+def create_app(debug: bool = False) -> Flask:
     """
     Create and configure the Flask application.
 
+    Args:
+        debug: Whether to enable debug mode
+        
     Returns:
         Configured Flask application
     """
+    # Set up logging
+    setup_logging(debug)
+    
+    # Configure Flask app
+    app.debug = debug
+    
     return app
 
 
@@ -61,6 +117,16 @@ def run_server(host: str = "0.0.0.0", port: int = 5000, debug: bool = False) -> 
         port: Port to bind the server to
         debug: Whether to run in debug mode
     """
+    # Set up logging
+    setup_logging(debug)
+    
+    # Configure Flask app
+    app.debug = debug
+    
+    # Log startup information
+    logger = logging.getLogger(__name__)
+    logger.info(f"Starting server on {host}:{port} with debug={debug}")
+    
     # Run with SocketIO instead of app.run()
     socketio.run(app, host=host, port=port, debug=debug)
 
@@ -76,7 +142,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    print(f"Starting server on {args.host}:{args.port} with debug={args.debug}")
+    # Run the server with command line arguments
     run_server(host=args.host, port=args.port, debug=args.debug)
 
 

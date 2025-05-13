@@ -5,11 +5,15 @@ This module contains the business logic for text processing.
 """
 
 import json
+import logging
 from typing import List, Optional, Dict, Any, cast
 
 from src.modules.text_processor.repositories.interfaces import SessionRepository
 from src.modules.llms.ai_client import AIClient, Message
 from src.modules.text_processor.models.domain import ProcessingResult, SessionState, Message as DomainMessage
+
+# Configure logger for this module
+logger = logging.getLogger(__name__)
 
 
 class TextProcessorService:
@@ -57,12 +61,12 @@ class TextProcessorService:
         if not text:
             return ProcessingResult(response="Please enter a number.", session_id=session_id)
         
-        print(f"[process_text] Processing: '{text}' for session: {session_id}")
+        logger.info(f"Processing text: '{text}' for session: {session_id}")
         
         # Generate LLM response with context if session_id is provided
         response = self._generate_llm_response(text, session_id)
         
-        print(f"[process_text] Response: '{response}' for session: {session_id}")
+        logger.info(f"Generated response: '{response}' for session: {session_id}")
         return ProcessingResult(response=response, session_id=session_id)
     
     def _generate_llm_response(self, prompt: str, session_id: Optional[str] = None) -> str:
@@ -111,12 +115,12 @@ class TextProcessorService:
             user_message: Message = {"role": "user", "content": prompt}
             messages.append(user_message)
             
-            # Log the messages being sent to the LLM for debugging
-            print(f"[LLM Request] Session: {session_id}, Messages: {json.dumps(messages, indent=2)}")
+            # Log the messages being sent to the LLM
+            logger.debug(f"Sending request to LLM for session {session_id}: {json.dumps(messages, indent=2)}")
             
             # Call generate_response through the AI client
             response = self.ai_client.generate_response(messages=messages)
-            print(f"[LLM Response] Session: {session_id}, Response: {response}")
+            logger.debug(f"Received response from LLM for session {session_id}: {response}")
             
             # Update session state if we have a session ID
             if session_id and response:
@@ -142,10 +146,10 @@ class TextProcessorService:
                 self.session_repository.save_session(session_id, state)
                 
                 # Log the updated session state
-                print(f"[Session State] Session: {session_id}, History length: {len(state.history)}")
+                logger.debug(f"Updated session state for session {session_id}, history length: {len(state.history)}")
             
             return response.strip() if response else "No response generated"
             
         except Exception as e:
-            print(f"Error generating LLM response: {str(e)}")
+            logger.error(f"Error generating LLM response: {str(e)}", exc_info=True)
             return f"I encountered an issue: {str(e)}" 

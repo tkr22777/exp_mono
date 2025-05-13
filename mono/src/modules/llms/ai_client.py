@@ -3,6 +3,7 @@ AI Client Module
 
 This module provides functionality to interact with external AI language models.
 """
+import logging
 from typing import Dict, List, Optional, Union
 
 import google.generativeai as genai
@@ -10,6 +11,9 @@ from openai import OpenAI
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 from src.utils.settings import settings
+
+# Configure logger for this module
+logger = logging.getLogger(__name__)
 
 # Initialize Gemini if API key is available
 if settings.GEMINI_API_KEY:
@@ -34,11 +38,11 @@ class AIClient:
 
         if openai_key.startswith("sk-proj-"):
             if not openai_org:
-                print(
-                    "Warning: Using a project API key but no organization ID is set. This may cause authentication issues."
+                logger.warning(
+                    "Using a project API key but no organization ID is set. This may cause authentication issues."
                 )
             else:
-                print(
+                logger.info(
                     f"Using OpenAI project API key with organization ID: {openai_org}"
                 )
 
