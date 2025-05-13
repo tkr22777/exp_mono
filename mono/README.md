@@ -56,14 +56,36 @@ GET /api/chains/{chain_id}  # Get chain details
 
 ```python
 # Basic usage
-from src.langchain_agent.api import process_with_langchain
+from src.modules.langchain_agent.api import process_with_langchain
 chain, results = process_with_langchain("Your text")
 
 # With persistence
-from src.langchain_agent.persistence.api import create_persistent_agent
+from src.modules.langchain_agent.api import create_persistent_agent
 agent = create_persistent_agent()
 chain, chain_id = agent.process_text_with_persistence("Your text")
 ```
+
+## Development Notes
+
+### Module Structure
+- Business logic is in `src/modules/langchain_agent/services`
+- Domain models are in `src/modules/langchain_agent/models/domain.py`
+- API models are in `src/modules/langchain_agent/models/api.py`
+- Repository interfaces are in `src/modules/langchain_agent/repositories/interfaces.py`
+- SQLite implementation is in `src/modules/langchain_agent/repositories/sqlite_repository.py`
+- SQLAlchemy models are in `src/modules/langchain_agent/repositories/models.py`
+
+### Migration Status
+The LangChain Agent module has been successfully migrated from `src/langchain_agent` to `src/modules/langchain_agent`.
+
+- ✅ All imports in the main codebase have been updated
+- ✅ The module structure follows best practices for separating business logic from infrastructure
+- ✅ The module is working correctly in the application
+- ✅ All tests are passing
+
+### Known Issues
+- Some type errors are still present but are being ignored via mypy.ini configuration
+- The test suite has been updated to match the new module structure
 
 ## License
 

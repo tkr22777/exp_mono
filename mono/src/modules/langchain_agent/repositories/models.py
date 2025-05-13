@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Type, TypeVar
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Session, declarative_base, relationship
 
-from src.langchain_agent.agent import DecisionChain, DecisionStep
+from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
 
 Base = declarative_base()
 T = TypeVar("T")
@@ -161,4 +161,4 @@ def get_or_create(
     instance = model(**params)
     session.add(instance)
     session.flush()
-    return instance
+    return instance 

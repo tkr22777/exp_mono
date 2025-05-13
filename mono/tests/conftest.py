@@ -2,71 +2,48 @@
 Test configuration and fixtures for pytest.
 """
 import pytest
+from typing import Any, Dict, List, Optional
 from langchain_core.language_models import BaseLanguageModel
+from langchain_core.messages import AIMessage
+from langchain_core.outputs import Generation, LLMResult
+from langchain_core.runnables import Runnable
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from src.langchain_agent.agent import DecisionChain, DecisionStep, LangChainAgent
-from src.langchain_agent.persistence.database import DecisionRepository
-from src.langchain_agent.persistence.models import Base
+from src.modules.langchain_agent import Base
+from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
+from src.modules.langchain_agent.repositories.sqlite_repository import SQLiteDecisionChainRepository
+from src.modules.langchain_agent.services.agent_service import LangChainAgentService
 
 
-class MockLLM(BaseLanguageModel):
-    """Mock LLM for testing purposes."""
+class MockLLM(Runnable):
+    """Simple mock LLM for testing purposes."""
 
-    # Add a model config to allow extra fields
-    model_config = {"extra": "allow"}
-
-    def __init__(self, responses=None):
+    def __init__(self, responses: Optional[List[str]] = None):
         """Initialize with predefined responses."""
-        super().__init__()
-        self._responses = responses or ["This is a mock response"]
-        self._invocations = []
+        self.responses = responses or ["This is a mock response"]
+        self.invocations = []
 
-    def invoke(self, input_data, **kwargs):
+    def invoke(self, input_data: Any, **kwargs: Any) -> str:
         """Mock invoke method that returns predefined responses."""
-        self._invocations.append(input_data)
-        return self._responses.pop(0) if self._responses else "Default mock response"
+        self.invocations.append(input_data)
+        return self.responses.pop(0) if self.responses else "Default mock response"
+    
+    def batch(self, inputs: List[Any], **kwargs: Any) -> List[str]:
+        """Process multiple inputs in a batch."""
+        return [self.invoke(input_data, **kwargs) for input_data in inputs]
+    
+    async def ainvoke(self, input_data: Any, **kwargs: Any) -> str:
+        """Async version of invoke."""
+        return self.invoke(input_data, **kwargs)
+    
+    async def abatch(self, inputs: List[Any], **kwargs: Any) -> List[str]:
+        """Async version of batch."""
+        return self.batch(inputs, **kwargs)
 
-    def generate(self, prompts, **kwargs):
-        """Mock generate method for compatibility."""
-        return [self.invoke(prompt) for prompt in prompts]
-
-    # Add required abstract methods
-    def predict(self, text, **kwargs):
-        """Required abstract method."""
-        return self.invoke(text, **kwargs)
-
-    def predict_messages(self, messages, **kwargs):
-        """Required abstract method."""
-        return self.invoke(messages, **kwargs)
-
-    def generate_prompt(self, prompts, **kwargs):
-        """Required abstract method."""
-        return self.generate(prompts, **kwargs)
-
-    async def apredict(self, text, **kwargs):
-        """Required abstract method."""
-        return self.predict(text, **kwargs)
-
-    async def apredict_messages(self, messages, **kwargs):
-        """Required abstract method."""
-        return self.predict_messages(messages, **kwargs)
-
-    async def agenerate_prompt(self, prompts, **kwargs):
-        """Required abstract method."""
-        return self.generate_prompt(prompts, **kwargs)
-
-    async def ainvoke(self, input, **kwargs):
-        """Required abstract method."""
-        return self.invoke(input, **kwargs)
-
-    async def agenerate(self, prompts, **kwargs):
-        """Required abstract method."""
-        return self.generate(prompts, **kwargs)
-
+    # Add property for compatibility
     @property
-    def metadata(self):
+    def metadata(self) -> Dict[str, str]:
         """Required property."""
         return {"name": "MockLLM"}
 
@@ -103,9 +80,10 @@ def db_session(in_memory_db):
 
 
 @pytest.fixture
-def repository(db_session):
-    """Fixture providing a repository with in-memory database session."""
-    return DecisionRepository(db_session)
+def repository():
+    """Fixture providing a repository with in-memory database."""
+    # Using None as db_path will use the in-memory database for testing
+    return SQLiteDecisionChainRepository(db_path=None)
 
 
 @pytest.fixture
@@ -151,10 +129,10 @@ def sample_decision_chain():
 
 
 @pytest.fixture
-def agent_with_mock_llm(mock_llm):
+def agent_with_mock_llm(mock_llm, repository):
     """Fixture providing a LangChainAgent with a mock LLM."""
     # Create a minimal agent with mocked components
-    agent = LangChainAgent(llm=mock_llm, verbose=False)
+    agent = LangChainAgentService(repository=repository, llm=mock_llm, verbose=False)
 
     # Create a simple mock executor that directly uses the mock LLM
     class MockSimpleLLMExecutor:

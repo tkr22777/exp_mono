@@ -10,9 +10,11 @@ from src.modules.langchain_agent.models.api import (
     ProcessTextResponse,
 )
 from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
+from src.modules.langchain_agent.repositories import Base
 from src.modules.langchain_agent.services import get_langchain_agent_service
 
 __all__ = [
+    "Base",
     "DecisionChain",
     "DecisionStep",
     "LangChainDecisionResult",

@@ -62,7 +62,7 @@ def get_decision_chain(
     Returns:
         The decision chain or None if not found
     """
-    repository = get_decision_chain_repository(db_path)
+    repository = get_decision_chain_repository(db_path=db_path)
     return repository.get_chain(chain_id)
 
 
@@ -77,7 +77,7 @@ def get_recent_chains(limit: int = 10, db_path: Optional[str] = None):
     Returns:
         List of decision chains
     """
-    repository = get_decision_chain_repository(db_path)
+    repository = get_decision_chain_repository(db_path=db_path)
     return repository.get_recent_chains(limit=limit)
 
 

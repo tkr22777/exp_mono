@@ -6,8 +6,8 @@ import json
 import pytest
 from sqlalchemy import inspect
 
-from src.langchain_agent.agent import DecisionChain, DecisionStep
-from src.langchain_agent.persistence.models import (
+from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
+from src.modules.langchain_agent.repositories.models import (
     Base,
     ChainModel,
     StepModel,

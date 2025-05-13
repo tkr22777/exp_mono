@@ -13,7 +13,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from src.langchain_agent.persistence.models import Base, ChainModel, StepModel
+from src.modules.langchain_agent.repositories.models import Base, ChainModel, StepModel
 from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
 
 

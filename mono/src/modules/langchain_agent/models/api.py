@@ -51,10 +51,14 @@ class LangChainDecisionResult(BaseModel):
     @classmethod
     def from_domain(cls, chain: DecisionChain) -> "LangChainDecisionResult":
         """Create a result model from a domain model."""
+        final_decision = chain.final_decision
+        if final_decision is None:
+            final_decision = "No final decision reached"
+            
         return cls(
             chain_id=chain.chain_id,
             title=chain.title,
-            final_decision=chain.final_decision,
+            final_decision=final_decision,
             step_count=len(chain.steps),
         )
 

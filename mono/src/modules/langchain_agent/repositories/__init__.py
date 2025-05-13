@@ -7,6 +7,7 @@ This module provides factory functions for creating repositories.
 from typing import Optional
 
 from src.modules.langchain_agent.repositories.interfaces import DecisionChainRepository
+from src.modules.langchain_agent.repositories.models import Base
 from src.modules.langchain_agent.repositories.sqlite_repository import SQLiteDecisionChainRepository
 
 # Singleton instance
