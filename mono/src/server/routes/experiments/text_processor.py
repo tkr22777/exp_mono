@@ -8,7 +8,7 @@ import logging
 from typing import Dict, Any, Tuple, Union, cast
 
 from flask import Blueprint, Response, jsonify, render_template, request
-from flask_socketio import emit, request as socketio_request
+from flask_socketio import emit
 from pydantic import ValidationError
 
 # Import the SocketIO instance and text processor
@@ -98,7 +98,7 @@ def handle_process_text_socket(data: Dict[str, Any]) -> None:
         return
 
     text = data["text"]
-    session_id = socketio_request.sid
+    session_id = request.sid
     logger.info(f"Processing text for session: {session_id}")
 
     try:
@@ -132,7 +132,7 @@ def handle_process_audio(data: Dict[str, Any]) -> None:
         demo_text = "42"  # Use a number for our calculator
 
         # Process text with session tracking
-        response_text = process_text(demo_text, socketio_request.sid)
+        response_text = process_text(demo_text, request.sid)
 
         # Send the complete response in one chunk
         emit("processing_update", {"chunk": response_text})
