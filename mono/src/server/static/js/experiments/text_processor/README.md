@@ -1,21 +1,32 @@
 # Text Processor React UI
 
-This directory contains React components for the Text Processor experiment.
+React components for text and audio processing experiments.
 
 ## Structure
 
 ```
 text_processor/
-├── dist/               # Compiled JavaScript (created by webpack)
+├── dist/               # Compiled JavaScript bundles
+│   ├── main-bundle.js     # Text processor bundle
+│   └── audio-bundle.js    # Audio processor bundle
 ├── src/                # React source code
 │   ├── components/     # React components
-│   │   ├── TextProcessor.jsx     # Main component
+│   │   ├── TextProcessor.jsx     # Main text processor
+│   │   ├── AudioProcessor.jsx    # Main audio processor
+│   │   ├── AudioRecorder.jsx     # Audio recording component
 │   │   ├── TextInput.jsx         # Text input component
-│   │   └── ProcessedResult.jsx   # Result display component
-│   └── index.js        # Entry point
+│   │   ├── ProcessedResult.jsx   # Result display component
+│   │   └── WebSocketResult.jsx   # WebSocket result component
+│   ├── index.js        # Text processor entry point
+│   └── audio.js        # Audio processor entry point
 ├── package.json        # NPM dependencies
-└── webpack.config.js   # Webpack configuration
+└── webpack.config.js   # Multi-bundle webpack config
 ```
+
+## Pages
+
+- `/experiments/text-processor/` - Text input processing
+- `/experiments/text-processor/audio` - Audio recording and processing
 
 ## Development
 
@@ -31,8 +42,6 @@ npm install
 npm run dev
 ```
 
-This will start webpack in watch mode, which will automatically recompile when files change.
-
 ### Build for Production
 
 ```bash
@@ -41,6 +50,4 @@ npm run build
 
 ## Integration with Flask
 
-The React components are loaded in the Flask template at `templates/experiments/text_processor/index.html`.
-
-Configuration is passed from Flask to React via the global `window.experimentConfig` object. 
+Components are loaded in Flask templates with configuration passed via `window.experimentConfig`. 

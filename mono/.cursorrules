@@ -10,7 +10,7 @@ Workflow and verification:
 - Always incrementally add small, non‑breaking changes and test them.
 - Do not add extra code as part of the core functionality. If needed, test a functionality by running the server and triggering the execution path.
 - If automated tests help, place them under tests/ (not required for this project) or add them to the codebase.
-- Do not test very simple things like object instantiation, only test business logic.
+- Focus tests on business logic and data transformations, not trivial operations like object instantiation.
 - If you are very confident after making a changed that is verfied working without any regression, you can try creating a git commit to update those changes.
 
 Remember the following specifications and structural guidelines:
@@ -20,7 +20,7 @@ Remember the following specifications and structural guidelines:
 - Place all tests under `tests/` mirroring package paths.
 - Provide a Makefile for multi‑step or hard‑to‑remember commands; avoid aliases for single‑word tools or commands.
 - You should use pydantic settings with ENV instead of using load_dotenv to load environment variables (this is creating a tight coupling between the modules and the settings file).
-- Keep README.md concise with high‑level technical information aimed at senior software engineers
+- Keep README.md concise with high-level technical information for engineers. Ensure it reflects the current state of the codebase without change history.
 - Avoid over‑commenting; docstrings only when intent is non‑obvious or business‑critical.
 - If you are reogranizing files in codebase, make sure to remove old files if corresponding new files(s) are created
 
