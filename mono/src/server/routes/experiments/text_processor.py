@@ -41,6 +41,14 @@ def index() -> str:
     )
 
 
+@text_processor_bp.route("/audio", methods=["GET"])
+def audio() -> str:
+    """Serve the Audio Processor page."""
+    return render_template(
+        "experiments/text_processor/audio.html", config=EXPERIMENT_CONFIG
+    )
+
+
 @text_processor_bp.route("/api/process", methods=["POST"])
 def handle_process_text() -> Tuple[Response, int]:
     """Process text for the Text Processor experiment."""

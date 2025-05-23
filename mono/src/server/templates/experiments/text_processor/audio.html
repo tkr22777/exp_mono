@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Processor</title>
+    <title>Audio Processor</title>
     <!-- Tailwind CSS -->
     <link href="/static/css/tailwind.css" rel="stylesheet">
     <script>
         // Expose experiment configuration for React
         window.experimentConfig = {
             debounceDelayMs: {{ config.debounce_delay_ms }},
-            defaultText: "{{ config.default_text }}",
             maxTextLength: {{ config.max_text_length }}
         };
     </script>
@@ -18,22 +17,25 @@
 <body class="bg-gray-50">
     <div class="container mx-auto max-w-4xl px-4 py-8">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Text Processor</h1>
-            <a href="/" class="px-4 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100 transition-colors">← Back to Home</a>
+            <h1 class="text-2xl font-bold text-gray-800">Audio Processor</h1>
+            <div class="flex space-x-4">
+                <a href="/experiments/text-processor" class="px-4 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100 transition-colors">← Text Processor</a>
+                <a href="/" class="px-4 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100 transition-colors">← Back to Home</a>
+            </div>
         </div>
         
         <!-- React Root Element -->
-        <div id="react-text-processor"></div>
+        <div id="react-audio-processor"></div>
         
         <footer class="mt-8 pt-4 border-t border-gray-200">
             <div class="text-center text-gray-600">
-                <p>Text Processor © 2023 | Built with Flask, React and Tailwind CSS</p>
-                <p class="text-sm">A real-time text processing system with server-side processing</p>
+                <p>Audio Processor © 2023 | Built with Flask, React and Tailwind CSS</p>
+                <p class="text-sm">A real-time audio processing system with AI integration</p>
             </div>
         </footer>
     </div>
 
     <!-- React Bundle -->
-    <script src="/static/js/experiments/text_processor/dist/main-bundle.js"></script>
+    <script src="/static/js/experiments/text_processor/dist/audio-bundle.js"></script>
 </body>
 </html> 
