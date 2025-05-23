@@ -17,8 +17,8 @@ from langchain_openai import ChatOpenAI
 
 from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
 from src.modules.langchain_agent.repositories.interfaces import DecisionChainRepository
-from src.modules.llms.ai_client import default_client
 from src.modules.llms import AIClientError
+from src.modules.llms.ai_client import default_client
 from src.utils.settings import settings
 
 
@@ -43,7 +43,7 @@ class LangChainAgentService:
         """
         # Store repository
         self.repository = repository
-        
+
         # Use the provided LLM or create a new one based on settings
         self.llm = llm or ChatOpenAI(
             api_key=settings.OPENAI_API_KEY,
@@ -288,57 +288,57 @@ class LangChainAgentService:
         self.complete_decision_chain(final_decision)
 
         return chain
-        
+
     def process_text_with_persistence(self, text: str) -> Tuple[DecisionChain, str]:
         """
         Process text and persist the decision chain.
-        
+
         Args:
             text: The input text to process
-            
+
         Returns:
             A tuple containing the decision chain and its ID
         """
         # Process the text
         chain = self.process_text(text)
-        
+
         # Save the chain
         chain_id = self.repository.save_chain(chain)
-        
+
         return chain, chain_id
-    
+
     def get_chain(self, chain_id: str) -> Optional[DecisionChain]:
         """
         Get a decision chain by ID.
-        
+
         Args:
             chain_id: The ID of the chain to get
-            
+
         Returns:
             The decision chain or None if not found
         """
         return self.repository.get_chain(chain_id)
-    
+
     def get_recent_chains(self, limit: int = 10) -> List[DecisionChain]:
         """
         Get recent decision chains.
-        
+
         Args:
             limit: Maximum number of chains to return
-            
+
         Returns:
             List of decision chains
         """
         return self.repository.get_recent_chains(limit=limit)
-    
+
     def delete_chain(self, chain_id: str) -> bool:
         """
         Delete a decision chain by ID.
-        
+
         Args:
             chain_id: The ID of the chain to delete
-            
+
         Returns:
             True if the chain was deleted, False otherwise
         """
-        return self.repository.delete_chain(chain_id) 
+        return self.repository.delete_chain(chain_id)

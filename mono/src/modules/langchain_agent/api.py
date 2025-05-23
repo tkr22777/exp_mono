@@ -129,4 +129,4 @@ class PersistentLangChainAgent:
         Returns:
             The loaded decision chain or None if not found
         """
-        return self.service.get_chain(chain_id) 
+        return self.service.get_chain(chain_id)

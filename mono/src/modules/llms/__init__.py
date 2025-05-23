@@ -2,18 +2,18 @@
 
 # Make the AI client and exceptions available at package level
 from src.modules.llms.ai_client import (
-    default_client,
     AIClientError,
-    OpenAIError,
-    GeminiError,
     DeepseekError,
+    GeminiError,
     InvalidAPIKeyError,
+    OpenAIError,
+    default_client,
 )
 
 __all__ = [
     "default_client",
     "AIClientError",
-    "OpenAIError", 
+    "OpenAIError",
     "GeminiError",
     "DeepseekError",
     "InvalidAPIKeyError",

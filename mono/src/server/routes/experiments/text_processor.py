@@ -5,17 +5,21 @@ This module defines all routes for the Text Processor experiment.
 """
 
 import logging
-from typing import Dict, Any, Tuple, Union, cast
+from typing import Any, Dict, Tuple, Union, cast
 
 from flask import Blueprint, Response, jsonify, render_template, request
 from flask_socketio import emit
 from pydantic import ValidationError
 
+from src.modules.text_processor.models.api import (
+    TextProcessRequest,
+    TextProcessResponse,
+)
+from src.modules.text_processor.models.domain import ProcessingResult
+from src.modules.text_processor.processor import process_text
+
 # Import the SocketIO instance and text processor
 from src.server.socketio_instance import socketio
-from src.modules.text_processor.processor import process_text
-from src.modules.text_processor.models.api import TextProcessRequest, TextProcessResponse
-from src.modules.text_processor.models.domain import ProcessingResult
 
 # Configure logger for this module
 logger = logging.getLogger(__name__)
@@ -60,14 +64,14 @@ def handle_process_text() -> Tuple[Response, int]:
     try:
         # Convert to request model
         req = TextProcessRequest(**data)
-        
+
         # Process text
         response_text = process_text(req.text, req.session_id)
-        
+
         # Create result and response
         result = ProcessingResult(response=response_text, session_id=req.session_id)
         response = TextProcessResponse.from_result(result)
-        
+
         # Return response
         return jsonify(response.dict()), 200
     except ValidationError as e:

@@ -25,7 +25,7 @@ def process_text(text: str, session_id: Optional[str] = None) -> str:
     """
     # Get the text processor service
     service = get_text_processor_service()
-    
+
     # Process the text and return the response
     result = service.process_text(text, session_id)
     return result.response

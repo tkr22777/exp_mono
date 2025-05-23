@@ -10,8 +10,8 @@ import os
 import pytest
 from openai import OpenAI
 
+from src.modules.llms import AIClientError, DeepseekError, GeminiError
 from src.modules.llms.ai_client import default_client
-from src.modules.llms import AIClientError, GeminiError, DeepseekError
 from src.utils.settings import settings
 
 

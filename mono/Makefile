@@ -1,9 +1,7 @@
-.PHONY: setup check clean help run lint format type-check install test serve serve-dev build-ui build-ui-dev build-css build-css-dev
+.PHONY: setup check clean help lint format type-check install test serve serve-dev build-ui build-ui-dev build-css build-css-dev
 
 # Variables
 PYTHON = python3
-TEXT ?= This is some example text to process and analyze. It has multiple sentences! How many? Let's find out.
-NAME ?= World
 SRC_DIR = src
 TEST_DIR = tests
 PORT ?= 5000
@@ -14,9 +12,6 @@ help:
 	@echo "Available commands:"
 	@echo "  make setup       - Install dependencies"
 	@echo "  make install     - Install all dependencies"
-	@echo "  make run         - Run the text processor with options:"
-	@echo "    TEXT=\"Your text\"                - Text to process (optional)"
-	@echo "    NAME=\"Your name\"                - Custom greeting name (optional)"
 	@echo "  make test        - Run all API tests using pytest"
 	@echo "  make check       - Run all code quality checks (lint, format, type-check)"
 	@echo "  make clean       - Clean up generated files"
@@ -52,10 +47,6 @@ install:
 		exit 1; \
 	fi
 
-# Run the experiment
-run: install
-	@poetry run python python_experiment.py --name "$(NAME)" --text "$(TEXT)" || echo "❌ Execution failed"
-
 # Test all AI models
 test: install
 	@echo "Running API tests..."
@@ -63,11 +54,11 @@ test: install
 
 # Linting
 lint:
-	@poetry run flake8 $(SRC_DIR) $(TEST_DIR) *.py
+	@poetry run flake8 $(SRC_DIR) $(TEST_DIR)
 
 # Formatting
 format:
-	@poetry run isort $(SRC_DIR) $(TEST_DIR) *.py && poetry run black $(SRC_DIR) $(TEST_DIR) *.py
+	@poetry run isort $(SRC_DIR) $(TEST_DIR) && poetry run black $(SRC_DIR) $(TEST_DIR)
 
 # Type checking
 type-check:
@@ -78,21 +69,21 @@ type-check:
 check:
 	@failures=0; \
 	echo "Running code quality checks..."; \
-	poetry run flake8 $(SRC_DIR) $(TEST_DIR) *.py; \
+	poetry run flake8 $(SRC_DIR) $(TEST_DIR); \
 	if [ $$? -ne 0 ]; then \
 		echo "❌ Flake8"; \
 		failures=$$((failures+1)); \
 	else \
 		echo "✅ Flake8"; \
 	fi; \
-	poetry run isort --check-only $(SRC_DIR) $(TEST_DIR) *.py; \
+	poetry run isort --check-only $(SRC_DIR) $(TEST_DIR); \
 	if [ $$? -ne 0 ]; then \
 		echo "❌ isort"; \
 		failures=$$((failures+1)); \
 	else \
 		echo "✅ isort"; \
 	fi; \
-	poetry run black --check $(SRC_DIR) $(TEST_DIR) *.py; \
+	poetry run black --check $(SRC_DIR) $(TEST_DIR); \
 	if [ $$? -ne 0 ]; then \
 		echo "❌ black"; \
 		failures=$$((failures+1)); \
@@ -110,7 +101,7 @@ check:
 
 # Automatically fix formatting issues
 fix-format:
-	@poetry run isort $(SRC_DIR) $(TEST_DIR) *.py && poetry run black $(SRC_DIR) $(TEST_DIR) *.py && echo "✅ Formatting fixed"
+	@poetry run isort $(SRC_DIR) $(TEST_DIR) && poetry run black $(SRC_DIR) $(TEST_DIR) && echo "✅ Formatting fixed"
 
 # Run the web server (production mode)
 serve: install

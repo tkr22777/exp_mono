@@ -20,13 +20,13 @@ def get_langchain_agent_service(
 ) -> LangChainAgentService:
     """
     Get the LangChain agent service instance.
-    
+
     Args:
         db_path: Path to the SQLite database file
         llm: The language model to use
         verbose: Whether to print verbose output during execution
         max_iterations: Maximum number of iterations for the agent to run
-        
+
     Returns:
         LangChain agent service instance
     """
@@ -36,4 +36,4 @@ def get_langchain_agent_service(
         llm=llm,
         verbose=verbose,
         max_iterations=max_iterations,
-    ) 
+    )

@@ -21,27 +21,35 @@ class TestProcessText:
     """Tests for the process_text function."""
 
     @patch("src.modules.text_processor.processor.get_text_processor_service")
-    def test_process_text_without_session(self, mock_get_service, mock_text_processor_service):
+    def test_process_text_without_session(
+        self, mock_get_service, mock_text_processor_service
+    ):
         """Test process_text without a session ID."""
         # Configure the mock
         mock_get_service.return_value = mock_text_processor_service
-        
+
         # Call the function
         result = process_text("Test text")
-        
+
         # Verify the result
         assert result == "Mock response"
-        mock_text_processor_service.process_text.assert_called_once_with("Test text", None)
+        mock_text_processor_service.process_text.assert_called_once_with(
+            "Test text", None
+        )
 
     @patch("src.modules.text_processor.processor.get_text_processor_service")
-    def test_process_text_with_session(self, mock_get_service, mock_text_processor_service):
+    def test_process_text_with_session(
+        self, mock_get_service, mock_text_processor_service
+    ):
         """Test process_text with a session ID."""
         # Configure the mock
         mock_get_service.return_value = mock_text_processor_service
-        
+
         # Call the function
         result = process_text("Test text", "test-session-id")
-        
+
         # Verify the result
         assert result == "Mock response"
-        mock_text_processor_service.process_text.assert_called_once_with("Test text", "test-session-id") 
+        mock_text_processor_service.process_text.assert_called_once_with(
+            "Test text", "test-session-id"
+        )

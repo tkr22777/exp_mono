@@ -26,26 +26,31 @@ Message = Dict[str, str]  # Contains 'role' and 'content' keys
 # Custom exception classes
 class AIClientError(Exception):
     """Base exception for AI client errors."""
+
     pass
 
 
 class OpenAIError(AIClientError):
     """Exception for OpenAI-specific errors."""
+
     pass
 
 
 class GeminiError(AIClientError):
     """Exception for Gemini-specific errors."""
+
     pass
 
 
 class DeepseekError(AIClientError):
     """Exception for Deepseek-specific errors."""
+
     pass
 
 
 class InvalidAPIKeyError(AIClientError):
     """Exception for invalid or missing API keys."""
+
     pass
 
 
@@ -115,9 +120,7 @@ class AIClient:
             ]
         else:
             # If no system message is included, add the default one
-            has_system_message = any(
-                msg.get("role") == "system" for msg in messages
-            )
+            has_system_message = any(msg.get("role") == "system" for msg in messages)
             if not has_system_message:
                 messages.insert(
                     0, {"role": "system", "content": "You are a helpful assistant."}

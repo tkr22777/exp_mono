@@ -40,4 +40,4 @@ class DecisionChain(BaseModel):
     status: str = Field(
         default="in_progress",
         description="Status of the decision chain (in_progress, completed, error)",
-    ) 
+    )

@@ -5,7 +5,7 @@ import argparse
 import logging
 import logging.config
 import os
-from typing import NoReturn, Dict, Any
+from typing import Any, Dict, NoReturn
 
 from flask import Flask
 from flask_cors import CORS
@@ -17,41 +17,37 @@ from src.server.routes.experiments.audio_processor import audio_processor_bp
 # Import SocketIO instance
 from src.server.socketio_instance import init_socketio, socketio
 
+
 def setup_logging(debug: bool = False) -> None:
     """Configure hierarchical logging with console output."""
     log_level = logging.DEBUG if debug else logging.INFO
-    
+
     logging_config: Dict[str, Any] = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'standard': {
-                'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": log_level,
+                "formatter": "standard",
+                "stream": "ext://sys.stdout",
             },
         },
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-                'level': log_level,
-                'formatter': 'standard',
-                'stream': 'ext://sys.stdout',
+        "loggers": {
+            "": {  # root logger
+                "handlers": ["console"],
+                "level": log_level,
+                "propagate": True,
             },
+            "src": {"handlers": ["console"], "level": log_level, "propagate": False},
         },
-        'loggers': {
-            '': {  # root logger
-                'handlers': ['console'],
-                'level': log_level,
-                'propagate': True
-            },
-            'src': {
-                'handlers': ['console'],
-                'level': log_level,
-                'propagate': False
-            },
-        }
     }
-    
+
     logging.config.dictConfig(logging_config)
+
 
 # Initialize Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
@@ -76,10 +72,10 @@ def run_server(host: str = "0.0.0.0", port: int = 5000, debug: bool = False) -> 
     """Run the server with Socket.IO support instead of standard Flask server."""
     setup_logging(debug)
     app.debug = debug
-    
+
     logger = logging.getLogger(__name__)
     logger.info(f"Starting server on {host}:{port} with debug={debug}")
-    
+
     # Use socketio.run instead of app.run
     socketio.run(app, host=host, port=port, debug=debug)
 

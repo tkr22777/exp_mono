@@ -9,8 +9,8 @@ from typing import Tuple
 
 from pydantic import BaseModel, Field
 
-from src.modules.llms.ai_client import default_client
 from src.modules.llms import AIClientError
+from src.modules.llms.ai_client import default_client
 from src.modules.planner.plan_creator import ProcessingPlan, create_plan
 
 

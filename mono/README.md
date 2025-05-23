@@ -1,6 +1,6 @@
 # Python Experiment with LangChain
 
-Text processing system with LangChain-based decision making, CLI and web interfaces.
+Text processing system with LangChain-based decision making and web interface.
 
 ## Requirements
 
@@ -12,7 +12,7 @@ Text processing system with LangChain-based decision making, CLI and web interfa
 - Text processor with planning and execution steps
 - LangChain agent for multi-step reasoning
 - SQLAlchemy-based persistence layer
-- CLI interface and RESTful API
+- RESTful API and web interface
 - Web interface with decision chain visualization
 
 ## Setup
@@ -21,20 +21,6 @@ Text processing system with LangChain-based decision making, CLI and web interfa
 python --version  # Ensure Python 3.12+
 poetry install
 cp .env.example .env  # Edit with your API keys
-```
-
-## CLI Usage
-
-```bash
-# Basic text processing
-poetry run python python_experiment.py --text "Your text"
-
-# With LangChain and persistence
-poetry run python python_experiment.py --text "Your text" --use-langchain --persist
-
-# View chains
-poetry run python python_experiment.py --list-recent
-poetry run python python_experiment.py --chain-id "chain_id"
 ```
 
 ## Server

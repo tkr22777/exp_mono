@@ -1,8 +1,9 @@
 """
 Test configuration and fixtures for pytest.
 """
-import pytest
 from typing import Any, Dict, List, Optional
+
+import pytest
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.messages import AIMessage
 from langchain_core.outputs import Generation, LLMResult
@@ -12,7 +13,9 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from src.modules.langchain_agent import Base
 from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
-from src.modules.langchain_agent.repositories.sqlite_repository import SQLiteDecisionChainRepository
+from src.modules.langchain_agent.repositories.sqlite_repository import (
+    SQLiteDecisionChainRepository,
+)
 from src.modules.langchain_agent.services.agent_service import LangChainAgentService
 
 
@@ -28,15 +31,15 @@ class MockLLM(Runnable):
         """Mock invoke method that returns predefined responses."""
         self.invocations.append(input_data)
         return self.responses.pop(0) if self.responses else "Default mock response"
-    
+
     def batch(self, inputs: List[Any], **kwargs: Any) -> List[str]:
         """Process multiple inputs in a batch."""
         return [self.invoke(input_data, **kwargs) for input_data in inputs]
-    
+
     async def ainvoke(self, input_data: Any, **kwargs: Any) -> str:
         """Async version of invoke."""
         return self.invoke(input_data, **kwargs)
-    
+
     async def abatch(self, inputs: List[Any], **kwargs: Any) -> List[str]:
         """Async version of batch."""
         return self.batch(inputs, **kwargs)

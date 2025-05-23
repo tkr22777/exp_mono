@@ -8,5 +8,4 @@ per-file-ignores =
     */llms/*.py: F401,E501
     tests/*: F401,E501
     tests/langchain_agent/persistence/test_database.py: F401,F811,E501
-    tests/conftest.py: F401,F811,E501
-    python_experiment.py: F401,F541 
+    tests/conftest.py: F401,F811,E501 

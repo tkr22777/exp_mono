@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import pytest
 
-from src.modules.langchain_agent.models.api import LangChainDecisionResult
 from src.modules.langchain_agent.api import process_with_langchain
+from src.modules.langchain_agent.models.api import LangChainDecisionResult
 
 
 def test_langchain_decision_result():

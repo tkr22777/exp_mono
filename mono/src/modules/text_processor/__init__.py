@@ -10,15 +10,14 @@ from src.modules.text_processor.service import TextProcessorService
 
 # Create a singleton instance of the text processor service
 _text_processor_service = TextProcessorService(
-    session_repository=get_session_repository(),
-    ai_client=default_client
+    session_repository=get_session_repository(), ai_client=default_client
 )
 
 
 def get_text_processor_service() -> TextProcessorService:
     """
     Get the text processor service instance.
-    
+
     Returns:
         Text processor service instance
     """

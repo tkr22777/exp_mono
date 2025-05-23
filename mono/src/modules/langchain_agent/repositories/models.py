@@ -29,8 +29,9 @@ class ChainModel(Base):
     status = Column(String(20), nullable=False, default="in_progress")
     created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.UTC))
     updated_at = Column(
-        DateTime, default=lambda: datetime.datetime.now(datetime.UTC), 
-        onupdate=lambda: datetime.datetime.now(datetime.UTC)
+        DateTime,
+        default=lambda: datetime.datetime.now(datetime.UTC),
+        onupdate=lambda: datetime.datetime.now(datetime.UTC),
     )
 
     # Relationship with steps
@@ -162,4 +163,4 @@ def get_or_create(
     instance = model(**params)
     session.add(instance)
     session.flush()
-    return instance 
+    return instance

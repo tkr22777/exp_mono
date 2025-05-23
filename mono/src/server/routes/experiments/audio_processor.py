@@ -4,7 +4,7 @@ Audio Processor Routes
 This module will contain routes for audio processing functionality.
 """
 
-from typing import Dict, Any, Tuple
+from typing import Any, Dict, Tuple
 
 from flask import Blueprint, Response, jsonify, render_template, request
 
@@ -42,15 +42,18 @@ def transcribe_audio() -> Tuple[Response, int]:
     # 4. Returning the text and metadata
 
     # For now, return a placeholder response
-    return jsonify(
-        {
-            "success": True,
-            "result": {
-                "transcribed_text": "This is a placeholder for transcribed text. Implement actual transcription service.",
-                "confidence": 0.0,
-            },
-        }
-    ), 200
+    return (
+        jsonify(
+            {
+                "success": True,
+                "result": {
+                    "transcribed_text": "This is a placeholder for transcribed text. Implement actual transcription service.",
+                    "confidence": 0.0,
+                },
+            }
+        ),
+        200,
+    )
 
 
 @audio_processor_bp.route("/api/process-audio", methods=["POST"])
@@ -74,12 +77,15 @@ def process_audio() -> Tuple[Response, int]:
     # 4. Returning the processed data
 
     # For now, return a placeholder response
-    return jsonify(
-        {
-            "success": True,
-            "result": {
-                "processed_result": "This is a placeholder for processed audio results. Implement actual multimodal AI processing.",
-                "processing_time_ms": 0,
-            },
-        }
-    ), 200
+    return (
+        jsonify(
+            {
+                "success": True,
+                "result": {
+                    "processed_result": "This is a placeholder for processed audio results. Implement actual multimodal AI processing.",
+                    "processing_time_ms": 0,
+                },
+            }
+        ),
+        200,
+    )

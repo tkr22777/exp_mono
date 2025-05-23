@@ -1,26 +1,25 @@
 """
 Tests for the database repository for LangChain Agent persistence.
 """
-import os
-from unittest.mock import patch
-import uuid
 import contextlib
 import json
+import os
+import uuid
 from typing import List
+from unittest.mock import patch
 
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
+from src.modules.langchain_agent.repositories.models import Base, ChainModel, StepModel
 from src.modules.langchain_agent.repositories.sqlite_repository import (
     DEFAULT_DB_PATH,
+    SQLiteDecisionChainRepository,
     get_engine,
     get_session,
 )
-from src.modules.langchain_agent.repositories.models import Base, ChainModel, StepModel
-from src.modules.langchain_agent.repositories.sqlite_repository import SQLiteDecisionChainRepository
 
 
 def test_get_engine_default_path():
@@ -117,7 +116,7 @@ def test_session_exception_handling():
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
-    
+
     # Define a local get_session function for this test
     @contextlib.contextmanager
     def local_get_session():
@@ -130,7 +129,7 @@ def test_session_exception_handling():
             raise
         finally:
             session.close()
-    
+
     # Use the context manager with an exception
     try:
         with local_get_session() as session:
@@ -250,13 +249,13 @@ def clean_repository():
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
-    
+
     # Create a repository that uses this isolated database
     class IsolatedRepository(SQLiteDecisionChainRepository):
         def __init__(self):
             # Override to use our isolated engine
             self.db_path = None
-            
+
         def save_chain(self, chain: DecisionChain) -> str:
             """Override to use isolated session."""
             session = Session()
@@ -287,7 +286,7 @@ def clean_repository():
                 # Save steps
                 for step in chain.steps:
                     self._save_step(session, step, chain.chain_id)
-                
+
                 session.commit()
                 return db_chain.chain_id
             except Exception:
@@ -295,8 +294,10 @@ def clean_repository():
                 raise
             finally:
                 session.close()
-                
-        def _save_step(self, session: Session, step: DecisionStep, chain_id: str) -> None:
+
+        def _save_step(
+            self, session: Session, step: DecisionStep, chain_id: str
+        ) -> None:
             """Save a decision step."""
             # Check if the step already exists
             db_step = session.query(StepModel).filter_by(step_id=step.step_id).first()
@@ -321,7 +322,7 @@ def clean_repository():
                 )
                 session.add(db_step)
                 session.flush()
-                
+
         def get_recent_chains(self, limit: int = 10) -> List[DecisionChain]:
             """Override to use isolated session."""
             session = Session()
@@ -332,7 +333,7 @@ def clean_repository():
                     .limit(limit)
                     .all()
                 )
-                
+
                 # Convert to domain models
                 chains = []
                 for db_chain in db_chains:
@@ -343,7 +344,7 @@ def clean_repository():
                         .order_by(StepModel.step_number)
                         .all()
                     )
-                    
+
                     # Convert to domain model
                     steps = [
                         DecisionStep(
@@ -356,7 +357,7 @@ def clean_repository():
                         )
                         for step in db_steps
                     ]
-                    
+
                     chains.append(
                         DecisionChain(
                             chain_id=db_chain.chain_id,
@@ -367,18 +368,18 @@ def clean_repository():
                             steps=steps,
                         )
                     )
-                
+
                 return chains
             finally:
                 session.close()
-    
+
     return IsolatedRepository()
 
 
 def test_repository_get_recent_chains(clean_repository):
     """Test getting recent chains from the repository."""
     repo = clean_repository
-    
+
     # Create sample chains
     sample_chain = DecisionChain(
         chain_id="test-chain-id-isolated",
@@ -388,7 +389,7 @@ def test_repository_get_recent_chains(clean_repository):
         final_decision="The final decision",
         status="completed",
     )
-    
+
     # Save multiple chains
     repo.save_chain(sample_chain)
 
@@ -416,7 +417,7 @@ def test_repository_get_recent_chains(clean_repository):
 def test_repository_get_recent_chains_limit(clean_repository):
     """Test limiting the number of chains retrieved."""
     repo = clean_repository
-    
+
     # Create sample chains
     sample_chain = DecisionChain(
         chain_id="test-chain-id-limit",
@@ -426,7 +427,7 @@ def test_repository_get_recent_chains_limit(clean_repository):
         final_decision="The final decision",
         status="completed",
     )
-    
+
     # Save multiple chains
     repo.save_chain(sample_chain)
 

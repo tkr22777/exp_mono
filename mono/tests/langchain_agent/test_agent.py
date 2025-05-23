@@ -4,8 +4,8 @@ Tests for the LangChain Agent implementation.
 import pytest
 
 from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
-from src.modules.langchain_agent.services.agent_service import LangChainAgentService
 from src.modules.langchain_agent.services import get_langchain_agent_service
+from src.modules.langchain_agent.services.agent_service import LangChainAgentService
 
 
 def test_decision_step_creation():

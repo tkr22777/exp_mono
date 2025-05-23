@@ -13,9 +13,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from src.modules.langchain_agent.repositories.models import Base, ChainModel, StepModel
 from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
-
+from src.modules.langchain_agent.repositories.models import Base, ChainModel, StepModel
 
 # Default SQLite database location
 DEFAULT_DB_PATH = os.path.join(
@@ -62,7 +61,7 @@ def get_session(db_path: Optional[str] = None) -> Iterator[Session]:
     engine = get_engine(db_path)
     session_factory = sessionmaker(bind=engine)
     session = session_factory()
-    
+
     try:
         yield session
         session.commit()
@@ -75,23 +74,23 @@ def get_session(db_path: Optional[str] = None) -> Iterator[Session]:
 
 class SQLiteDecisionChainRepository:
     """SQLite implementation of the decision chain repository."""
-    
+
     def __init__(self, db_path: Optional[str] = None):
         """
         Initialize the repository.
-        
+
         Args:
             db_path: Path to the SQLite database file
         """
         self.db_path = db_path
-    
+
     def save_chain(self, chain: DecisionChain) -> str:
         """
         Save a decision chain.
-        
+
         Args:
             chain: The decision chain to save
-            
+
         Returns:
             The ID of the saved chain
         """
@@ -124,11 +123,11 @@ class SQLiteDecisionChainRepository:
                 self._save_step(session, step, chain.chain_id)
 
             return db_chain.chain_id
-    
+
     def _save_step(self, session: Session, step: DecisionStep, chain_id: str) -> None:
         """
         Save a decision step.
-        
+
         Args:
             session: SQLAlchemy session
             step: The decision step to save
@@ -157,23 +156,23 @@ class SQLiteDecisionChainRepository:
             )
             session.add(db_step)
             session.flush()
-    
+
     def get_chain(self, chain_id: str) -> Optional[DecisionChain]:
         """
         Get a decision chain by ID.
-        
+
         Args:
             chain_id: The ID of the chain to get
-            
+
         Returns:
             The decision chain or None if not found
         """
         with get_session(self.db_path) as session:
             db_chain = session.query(ChainModel).filter_by(chain_id=chain_id).first()
-            
+
             if not db_chain:
                 return None
-            
+
             # Get steps
             db_steps = (
                 session.query(StepModel)
@@ -181,7 +180,7 @@ class SQLiteDecisionChainRepository:
                 .order_by(StepModel.step_number)
                 .all()
             )
-            
+
             # Convert to domain model
             steps = [
                 DecisionStep(
@@ -194,7 +193,7 @@ class SQLiteDecisionChainRepository:
                 )
                 for step in db_steps
             ]
-            
+
             return DecisionChain(
                 chain_id=db_chain.chain_id,
                 title=db_chain.title,
@@ -203,14 +202,14 @@ class SQLiteDecisionChainRepository:
                 status=db_chain.status,
                 steps=steps,
             )
-    
+
     def get_recent_chains(self, limit: int = 10) -> List[DecisionChain]:
         """
         Get recent decision chains.
-        
+
         Args:
             limit: Maximum number of chains to return
-            
+
         Returns:
             List of decision chains
         """
@@ -221,7 +220,7 @@ class SQLiteDecisionChainRepository:
                 .limit(limit)
                 .all()
             )
-            
+
             # Convert to domain models
             chains = []
             for db_chain in db_chains:
@@ -232,7 +231,7 @@ class SQLiteDecisionChainRepository:
                     .order_by(StepModel.step_number)
                     .all()
                 )
-                
+
                 # Convert to domain model
                 steps = [
                     DecisionStep(
@@ -245,7 +244,7 @@ class SQLiteDecisionChainRepository:
                     )
                     for step in db_steps
                 ]
-                
+
                 chains.append(
                     DecisionChain(
                         chain_id=db_chain.chain_id,
@@ -256,24 +255,24 @@ class SQLiteDecisionChainRepository:
                         steps=steps,
                     )
                 )
-            
+
             return chains
-    
+
     def delete_chain(self, chain_id: str) -> bool:
         """
         Delete a decision chain by ID.
-        
+
         Args:
             chain_id: The ID of the chain to delete
-            
+
         Returns:
             True if the chain was deleted, False otherwise
         """
         with get_session(self.db_path) as session:
             # Delete steps first
             session.query(StepModel).filter_by(chain_id=chain_id).delete()
-            
+
             # Delete chain
             result = session.query(ChainModel).filter_by(chain_id=chain_id).delete()
-            
-            return result > 0 
+
+            return result > 0

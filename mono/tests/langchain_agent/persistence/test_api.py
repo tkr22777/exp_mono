@@ -5,13 +5,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.modules.langchain_agent.models.domain import DecisionChain
 from src.modules.langchain_agent.api import (
     PersistentLangChainAgent,
     create_persistent_agent,
     get_decision_chain,
     get_recent_chains,
 )
+from src.modules.langchain_agent.models.domain import DecisionChain
 
 
 @patch("src.modules.langchain_agent.api.get_decision_chain_repository")
@@ -23,15 +23,11 @@ def test_get_decision_chain(mock_get_repository, sample_decision_chain):
     mock_repository.get_chain.return_value = sample_decision_chain
 
     # Call the function
-    result = get_decision_chain(
-        sample_decision_chain.chain_id, db_path="/test/path.db"
-    )
+    result = get_decision_chain(sample_decision_chain.chain_id, db_path="/test/path.db")
 
     # Verify the calls
     mock_get_repository.assert_called_once_with(db_path="/test/path.db")
-    mock_repository.get_chain.assert_called_once_with(
-        sample_decision_chain.chain_id
-    )
+    mock_repository.get_chain.assert_called_once_with(sample_decision_chain.chain_id)
 
     # Verify the result
     assert result == sample_decision_chain
@@ -60,7 +56,7 @@ def test_persistent_langchain_agent_init():
     """Test initializing a PersistentLangChainAgent."""
     # Create a mock service
     mock_service = MagicMock()
-    
+
     # Create the agent
     agent = PersistentLangChainAgent(mock_service)
 
@@ -73,7 +69,7 @@ def test_persistent_agent_load_chain(sample_decision_chain):
     # Create a mock service
     mock_service = MagicMock()
     mock_service.get_chain.return_value = sample_decision_chain
-    
+
     # Create an agent
     agent = PersistentLangChainAgent(mock_service)
 
@@ -92,7 +88,7 @@ def test_persistent_agent_load_chain_not_found():
     # Create a mock service
     mock_service = MagicMock()
     mock_service.get_chain.return_value = None
-    
+
     # Create an agent
     agent = PersistentLangChainAgent(mock_service)
 
@@ -114,7 +110,7 @@ def test_persistent_agent_process_text_with_persistence(sample_decision_chain):
         sample_decision_chain,
         sample_decision_chain.chain_id,
     )
-    
+
     # Create an agent
     agent = PersistentLangChainAgent(mock_service)
 
