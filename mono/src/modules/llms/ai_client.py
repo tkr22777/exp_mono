@@ -23,6 +23,32 @@ if settings.GEMINI_API_KEY:
 Message = Dict[str, str]  # Contains 'role' and 'content' keys
 
 
+# Custom exception classes
+class AIClientError(Exception):
+    """Base exception for AI client errors."""
+    pass
+
+
+class OpenAIError(AIClientError):
+    """Exception for OpenAI-specific errors."""
+    pass
+
+
+class GeminiError(AIClientError):
+    """Exception for Gemini-specific errors."""
+    pass
+
+
+class DeepseekError(AIClientError):
+    """Exception for Deepseek-specific errors."""
+    pass
+
+
+class InvalidAPIKeyError(AIClientError):
+    """Exception for invalid or missing API keys."""
+    pass
+
+
 class AIClient:
     """Client for interacting with external AI models."""
 
@@ -72,28 +98,32 @@ class AIClient:
 
         Returns:
             The AI model's response as a string
+
+        Raises:
+            OpenAIError: If there's an error with the OpenAI API
+            ValueError: If neither prompt nor messages are provided
         """
-        try:
-            # Convert prompt to messages format if messages not provided
-            if messages is None:
-                if prompt is None:
-                    raise ValueError("Either prompt or messages must be provided")
+        # Convert prompt to messages format if messages not provided
+        if messages is None:
+            if prompt is None:
+                raise ValueError("Either prompt or messages must be provided")
 
-                # Use default system message with prompt
-                messages = [
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": prompt},
-                ]
-            else:
-                # If no system message is included, add the default one
-                has_system_message = any(
-                    msg.get("role") == "system" for msg in messages
+            # Use default system message with prompt
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt},
+            ]
+        else:
+            # If no system message is included, add the default one
+            has_system_message = any(
+                msg.get("role") == "system" for msg in messages
+            )
+            if not has_system_message:
+                messages.insert(
+                    0, {"role": "system", "content": "You are a helpful assistant."}
                 )
-                if not has_system_message:
-                    messages.insert(
-                        0, {"role": "system", "content": "You are a helpful assistant."}
-                    )
 
+        try:
             response = self.client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
@@ -106,7 +136,8 @@ class AIClient:
             return "No response generated."
 
         except Exception as e:
-            return f"Error generating AI response: {str(e)}"
+            logger.error(f"Error generating OpenAI response: {str(e)}", exc_info=True)
+            raise OpenAIError(f"Error generating AI response: {str(e)}") from e
 
     def generate_with_gemini(self, input_data: str) -> str:
         """
@@ -119,10 +150,11 @@ class AIClient:
             The generated response from Gemini
 
         Raises:
-            ValueError: If the Gemini API key is not configured
+            InvalidAPIKeyError: If the Gemini API key is not configured
+            GeminiError: If there's an error with the Gemini API
         """
         if not settings.GEMINI_API_KEY:
-            raise ValueError(
+            raise InvalidAPIKeyError(
                 "Gemini API key not found in settings. "
                 "Please add GEMINI_API_KEY to your .env file."
             )
@@ -149,7 +181,8 @@ class AIClient:
 
             return response.text
         except Exception as e:
-            return f"Error generating Gemini response: {str(e)}"
+            logger.error(f"Error generating Gemini response: {str(e)}", exc_info=True)
+            raise GeminiError(f"Error generating Gemini response: {str(e)}") from e
 
     @retry(
         stop=stop_after_attempt(1),  # Initial attempt + retries combined
@@ -167,10 +200,11 @@ class AIClient:
             The generated response from Deepseek
 
         Raises:
-            ValueError: If the Deepseek API key is not configured
+            InvalidAPIKeyError: If the Deepseek API key is not configured
+            DeepseekError: If there's an error with the Deepseek API
         """
         if not settings.DEEPSEEK_API_KEY:
-            raise ValueError(
+            raise InvalidAPIKeyError(
                 "Deepseek API key not found in settings. "
                 "Please add DEEPSEEK_API_KEY to your .env file."
             )
@@ -193,7 +227,8 @@ class AIClient:
             )
             return response.choices[0].message.content
         except Exception as e:
-            return f"Error generating Deepseek response: {str(e)}"
+            logger.error(f"Error generating Deepseek response: {str(e)}", exc_info=True)
+            raise DeepseekError(f"Error generating Deepseek response: {str(e)}") from e
 
 
 default_client = AIClient()
