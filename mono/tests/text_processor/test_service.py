@@ -7,6 +7,7 @@ import pytest
 
 from src.modules.text_processor.models.domain import ProcessingResult, SessionState, Message
 from src.modules.text_processor.service import TextProcessorService
+from src.modules.llms import AIClientError
 
 
 @pytest.fixture
@@ -105,8 +106,8 @@ class TestTextProcessorService:
         
     def test_generate_llm_response_exception_handling(self, text_processor_service, mock_ai_client):
         """Test exception handling in _generate_llm_response."""
-        mock_ai_client.generate_response.side_effect = Exception("Test error")
+        mock_ai_client.generate_response.side_effect = AIClientError("Test AI error")
         
         response = text_processor_service._generate_llm_response("42")
         
-        assert "I encountered an issue: Test error" in response 
+        assert "I encountered an AI processing issue: Test AI error" in response 

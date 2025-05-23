@@ -11,6 +11,7 @@ import pytest
 from openai import OpenAI
 
 from src.modules.llms.ai_client import default_client
+from src.modules.llms import AIClientError, GeminiError, DeepseekError
 from src.utils.settings import settings
 
 
@@ -44,9 +45,6 @@ def verify_json_response(response: str) -> bool:
         True if the response contains valid JSON with the expected fields
     """
     try:
-        if response.startswith("Error generating"):  # Handle client-side error messages
-            return False
-
         # Attempt to extract JSON if wrapped in markdown code blocks
         if "```json" in response:
             start = response.find("```json") + 7
@@ -117,7 +115,7 @@ def test_gemini():
         assert verify_json_response(
             response
         ), f"Response should be valid JSON with expected structure. Got: {response}"
-    except Exception as e:
+    except (GeminiError, AIClientError) as e:
         pytest.skip(f"Gemini API error: {str(e)}")
 
 
@@ -132,5 +130,5 @@ def test_deepseek():
         assert verify_json_response(
             response
         ), f"Response should be valid JSON with expected structure. Got: {response}"
-    except Exception as e:
+    except (DeepseekError, AIClientError) as e:
         pytest.skip(f"Deepseek API error: {str(e)}")
