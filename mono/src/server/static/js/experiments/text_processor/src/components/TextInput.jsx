@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const TextInput = ({ value, onChange, maxLength, disabled }) => {
+const TextInput = ({ value, onChange, onKeyPress, maxLength, disabled, placeholder }) => {
   const [charCount, setCharCount] = useState(value.length);
 
   useEffect(() => {
@@ -9,6 +9,12 @@ const TextInput = ({ value, onChange, maxLength, disabled }) => {
 
   const handleChange = (e) => {
     onChange(e.target.value);
+  };
+
+  const handleKeyPress = (e) => {
+    if (onKeyPress) {
+      onKeyPress(e);
+    }
   };
 
   return (
@@ -22,10 +28,11 @@ const TextInput = ({ value, onChange, maxLength, disabled }) => {
           disabled ? 'bg-gray-100 cursor-not-allowed' : ''
         }`}
         rows="5" 
-        placeholder="Start typing here or use the audio recorder below..." 
+        placeholder={placeholder || "Start typing here or use the audio recorder below..."} 
         maxLength={maxLength}
         value={value}
         onChange={handleChange}
+        onKeyPress={handleKeyPress}
         disabled={disabled}
       />
       <div className="mt-1 text-xs text-gray-500 flex justify-between">
