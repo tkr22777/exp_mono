@@ -10,6 +10,7 @@ from typing import Tuple
 from pydantic import BaseModel, Field
 
 from src.modules.llms.ai_client import default_client
+from src.modules.llms import AIClientError
 from src.modules.planner.plan_creator import ProcessingPlan, create_plan
 
 
@@ -30,9 +31,15 @@ def get_ai_response(text: str) -> str:
 
     Returns:
         Response from the AI model
+
+    Raises:
+        AIClientError: If there's an error with the AI service
     """
     prompt = f"Please provide a brief analysis of the following text: {text}"
-    return default_client.generate_response(prompt)
+    try:
+        return default_client.generate_response(prompt)
+    except AIClientError as e:
+        raise AIClientError(f"Failed to get AI response: {str(e)}") from e
 
 
 def execute_plan(plan: ProcessingPlan, text: str) -> ProcessingResult:
@@ -46,11 +53,17 @@ def execute_plan(plan: ProcessingPlan, text: str) -> ProcessingResult:
     Returns:
         Results of the executed plan
     """
-    ai_response = get_ai_response(text)
+    try:
+        ai_response = get_ai_response(text)
+        status = "executed"
+    except AIClientError as e:
+        ai_response = f"AI processing failed: {str(e)}"
+        status = "error"
 
     results = ProcessingResult(
         title=plan.title,
         ai_response=ai_response,
+        status=status,
     )
 
     return results

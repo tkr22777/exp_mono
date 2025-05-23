@@ -10,6 +10,7 @@ from typing import List, Optional, Dict, Any, cast
 
 from src.modules.text_processor.repositories.interfaces import SessionRepository
 from src.modules.llms.ai_client import AIClient, Message
+from src.modules.llms import AIClientError
 from src.modules.text_processor.models.domain import ProcessingResult, SessionState, Message as DomainMessage
 
 # Configure logger for this module
@@ -120,6 +121,9 @@ class TextProcessorService:
             
             return response.strip() if response else "No response generated"
             
+        except AIClientError as e:
+            logger.error(f"AI client error while generating response: {str(e)}", exc_info=True)
+            return f"I encountered an AI processing issue: {str(e)}"
         except Exception as e:
-            logger.error(f"Error generating LLM response: {str(e)}", exc_info=True)
-            return f"I encountered an issue: {str(e)}" 
+            logger.error(f"Unexpected error generating LLM response: {str(e)}", exc_info=True)
+            return f"I encountered an unexpected issue: {str(e)}" 

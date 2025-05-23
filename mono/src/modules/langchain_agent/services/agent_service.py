@@ -18,6 +18,7 @@ from langchain_openai import ChatOpenAI
 from src.modules.langchain_agent.models.domain import DecisionChain, DecisionStep
 from src.modules.langchain_agent.repositories.interfaces import DecisionChainRepository
 from src.modules.llms.ai_client import default_client
+from src.modules.llms import AIClientError
 from src.utils.settings import settings
 
 
@@ -136,7 +137,11 @@ class LangChainAgentService:
         # Generate a title if not provided
         if not title:
             prompt = f"Generate a concise title (5-7 words) for a decision process about: {context}"
-            title = default_client.generate_response(prompt).strip()
+            try:
+                title = default_client.generate_response(prompt).strip()
+            except AIClientError as e:
+                # Fallback to a generic title if AI generation fails
+                title = "Decision Process"
 
         # Create a new decision chain
         self.active_chain = DecisionChain(
