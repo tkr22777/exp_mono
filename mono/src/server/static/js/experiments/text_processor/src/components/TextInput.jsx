@@ -18,17 +18,14 @@ const TextInput = ({ value, onChange, onKeyPress, maxLength, disabled, placehold
   };
 
   return (
-    <div className="mb-4">
-      <label htmlFor="text-input" className="block text-gray-700 text-sm font-medium mb-2">
-        Text Input
-      </label>
+    <div>
       <textarea 
         id="text-input" 
         className={`w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
           disabled ? 'bg-gray-100 cursor-not-allowed' : ''
         }`}
-        rows="5" 
-        placeholder={placeholder || "Start typing here or use the audio recorder below..."} 
+        rows="6" 
+        placeholder={placeholder || "Start typing here..."} 
         maxLength={maxLength}
         value={value}
         onChange={handleChange}
@@ -39,7 +36,7 @@ const TextInput = ({ value, onChange, onKeyPress, maxLength, disabled, placehold
         <span>
           {charCount} characters
         </span>
-        {disabled && <span className="text-blue-600">Input disabled during transcription...</span>}
+        {disabled && <span className="text-blue-600">Input disabled...</span>}
       </div>
     </div>
   );

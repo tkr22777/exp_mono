@@ -43,6 +43,12 @@ def setup_logging(debug: bool = False) -> None:
                 "propagate": True,
             },
             "src": {"handlers": ["console"], "level": log_level, "propagate": False},
+            # Suppress verbose HTTP client logs
+            "httpcore": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+            "httpx": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+            "urllib3": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+            # Keep OpenAI client logs at INFO level to see request summaries without verbose details
+            "openai": {"handlers": ["console"], "level": "INFO", "propagate": False},
         },
     }
 

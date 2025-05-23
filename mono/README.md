@@ -9,7 +9,7 @@ Text processing system with LangChain-based decision making and web interface.
 
 ## Core Components
 
-- Text processor with planning and execution steps
+- Text processor with two-step transformation (intent analysis + execution)
 - LangChain agent for multi-step reasoning
 - SQLAlchemy-based persistence layer
 - RESTful API and web interface
@@ -38,6 +38,15 @@ GET /api/chains             # List chains
 GET /api/chains/{chain_id}  # Get chain details
 ```
 
+## Text Transformation Process
+
+The text processor uses a sophisticated two-step approach for transformations:
+
+1. **Intent Analysis**: Analyzes user input to understand transformation intent
+2. **Transformation Execution**: Applies precise changes based on analyzed intent
+
+This approach improves accuracy by separating understanding from execution.
+
 ## Integration
 
 ```python
@@ -49,6 +58,12 @@ chain, results = process_with_langchain("Your text")
 from src.modules.langchain_agent.api import create_persistent_agent
 agent = create_persistent_agent()
 chain, chain_id = agent.process_text_with_persistence("Your text")
+
+# Text transformation
+from src.modules.text_processor.service import TextProcessorService
+processor = TextProcessorService(session_repo, ai_client)
+result = processor.process_text("a blue car", session_id)  # Establish state
+result = processor.process_text("make it red", session_id)  # Transform
 ```
 
 ## Architecture
@@ -59,7 +74,7 @@ chain, chain_id = agent.process_text_with_persistence("Your text")
   - `models/`: Domain and API models
   - `repositories/`: Persistence interfaces and implementations
 - `src/modules/text_processor`: Text processing functionality
-  - `service.py`: Core business logic
+  - `service.py`: Core business logic with two-step transformation
   - `models/`: Domain and API models
   - `repositories/`: Session storage interfaces and implementations
 - `src/server/`: Flask application with REST API and Socket.IO

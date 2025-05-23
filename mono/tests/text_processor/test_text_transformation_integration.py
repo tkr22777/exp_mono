@@ -121,3 +121,67 @@ class TestTextTransformationIntegration:
         # Valid input after invalid ones should still work
         result_valid = service.process_text("a happy bird", session_id)
         assert "bird" in result_valid.response.lower()
+
+    def test_transformation_instruction_as_first_message(self, service, session_id):
+        """Test handling transformation instruction as first message without established state."""
+        # Send transformation instruction as first message
+        result = service.process_text("make it purple", session_id)
+        
+        # Should ask for text to establish state
+        assert any(
+            phrase in result.response.lower()
+            for phrase in [
+                "provide some text",
+                "establish",
+                "initial state",
+                "text to work with",
+            ]
+        )
+
+    def test_ambiguous_first_message_handling(self, service, session_id):
+        """Test handling of ambiguous first messages like 'with double e'."""
+        # Send ambiguous instruction as first message
+        result = service.process_text("with double e", session_id)
+        
+        # Should ask for clarification or text to establish state
+        assert any(
+            phrase in result.response.lower()
+            for phrase in [
+                "provide some text",
+                "establish",
+                "initial state",
+                "text to work with",
+            ]
+        )
+
+    def test_two_step_transformation_process(self, service, session_id):
+        """Test that the two-step process (intent analysis + transformation execution) works correctly."""
+        # Establish initial state
+        result1 = service.process_text("a tiny green butterfly", session_id)
+        assert "green butterfly" in result1.response.lower()
+        
+        # Test complex transformation that should benefit from two-step process
+        result2 = service.process_text("make it huge and change color to bright orange", session_id)
+        
+        # Verify transformation was applied correctly
+        assert "butterfly" in result2.response.lower()  # Object preserved
+        assert "orange" in result2.response.lower()      # Color changed
+        assert any(size in result2.response.lower() for size in ["huge", "large", "big"])  # Size changed
+        assert "green" not in result2.response.lower()   # Old color removed
+        assert "tiny" not in result2.response.lower()    # Old size removed
+
+    def test_intent_analysis_with_current_text(self, service, session_id):
+        """Test that intent analysis can see and work with current text state."""
+        # Establish a specific state that requires context awareness
+        result1 = service.process_text("a red sports car with racing stripes", session_id)
+        assert "red sports car" in result1.response.lower()
+        assert "racing stripes" in result1.response.lower()
+        
+        # Apply transformation that requires understanding current attributes
+        result2 = service.process_text("remove the stripes but keep it sporty", session_id)
+        
+        # Verify the transformation understood the context
+        assert "car" in result2.response.lower()         # Object preserved
+        assert "sport" in result2.response.lower()       # Sporty nature preserved
+        assert "red" in result2.response.lower()         # Color preserved
+        assert "stripe" not in result2.response.lower()  # Stripes removed
