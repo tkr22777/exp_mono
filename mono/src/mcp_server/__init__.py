@@ -6,4 +6,4 @@ This module provides a simple MCP server implementation for external tool integr
 
 from .server import SimpleMCPServer
 
-__all__ = ["SimpleMCPServer"] 
+__all__ = ["SimpleMCPServer"]

@@ -23,23 +23,23 @@ AVAILABLE_TOOLS = [
     {
         "name": "calculate",
         "description": "Evaluate mathematical expressions safely",
-        "example": "2 + 3 * 4"
+        "example": "2 + 3 * 4",
     },
     {
         "name": "text_stats",
         "description": "Get statistics about text",
-        "example": "Hello world! This is a test."
+        "example": "Hello world! This is a test.",
     },
     {
         "name": "system_info",
         "description": "Get basic system information",
-        "example": "No input required"
+        "example": "No input required",
     },
     {
         "name": "format_text",
         "description": "Format text in various ways",
-        "example": "hello world"
-    }
+        "example": "hello world",
+    },
 ]
 
 # === Socket.IO Event Names ===
@@ -50,5 +50,5 @@ SOCKET_EVENTS = {
     "mcp_tools_list": "mcp_tools_list",
     "mcp_error": "mcp_error",
     "mcp_processing_start": "mcp_processing_start",
-    "mcp_processing_complete": "mcp_processing_complete"
-} 
+    "mcp_processing_complete": "mcp_processing_complete",
+}
