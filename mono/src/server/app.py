@@ -11,7 +11,7 @@ from flask import Flask
 from flask_cors import CORS
 
 # Import blueprints
-from src.server.routes import langchain_bp, main_bp, text_processor_bp
+from src.server.routes import langchain_bp, main_bp, mcp_server_bp, text_processor_bp
 from src.server.routes.experiments.audio_processor import audio_processor_bp
 
 # Import SocketIO instance
@@ -63,6 +63,7 @@ init_socketio(app)
 # Register blueprints
 app.register_blueprint(main_bp)
 app.register_blueprint(langchain_bp)
+app.register_blueprint(mcp_server_bp)
 app.register_blueprint(text_processor_bp)
 app.register_blueprint(audio_processor_bp)
 
