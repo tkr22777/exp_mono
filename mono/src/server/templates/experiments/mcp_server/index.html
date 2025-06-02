@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Server Explorer</title>
+    <!-- Tailwind CSS -->
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+    <script>
+        // Expose experiment configuration for React
+        window.experimentConfig = {
+            debounceDelayMs: {{ config.debounce_delay_ms }},
+            maxTextLength: {{ config.max_text_length }},
+            availableTools: {{ config.available_tools | tojson }}
+        };
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto max-w-6xl px-4 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">MCP Server Explorer</h1>
+                <p class="text-gray-600 mt-2">Interactive Model Context Protocol server testing interface</p>
+            </div>
+            <a href="/" class="px-4 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100 transition-colors">← Back to Home</a>
+        </div>
+        
+        <!-- React Root Element -->
+        <div id="react-mcp-server"></div>
+        
+        <footer class="mt-8 pt-4 border-t border-gray-200">
+            <div class="text-center text-gray-600">
+                <p>MCP Server Explorer © 2024 | Built with Flask, React and Tailwind CSS</p>
+                <p class="text-sm">Interactive Model Context Protocol testing • Real-time tool execution</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- React Bundle - We'll create this -->
+    <script src="/static/js/experiments/mcp_server/dist/main-bundle.js"></script>
+</body>
+</html> 
