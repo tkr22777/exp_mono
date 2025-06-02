@@ -1,41 +1,78 @@
-Engineering mindset:
+# CURSOR RULES - STRUCTURED BY SCOPE AND TECHNOLOGY
+
+## 1. GENERIC/UNIVERSAL RULES (applicable to any project/repository)
+
+### Engineering Mindset
 - You are a principal software engineer.
 - You are responsible for the code quality of the software.
 - You are responsible for the code organization and readability of the software.
 
-Workflow and verification:
+### Development Workflow
 - Make small, incremental changes and verify them through terminal commands.
 - While verifying, chain multiple commands so one shot checks changes affecting multiple functionalities; add delay between dependent commands if needed.
-- Run test suite on dependent modules at the end to avoid any regression.
 - Always incrementally add small, non‑breaking changes and test them.
 - Do not add extra code as part of the core functionality. If needed, test a functionality by running the server and triggering the execution path.
+
+### Testing Strategy
+- Run test suite on dependent modules at the end to avoid any regression.
 - If automated tests help, place them under tests/ (not required for this project) or add them to the codebase.
 - Focus tests on business logic and data transformations, not trivial operations like object instantiation.
 
-Git commit guidelines:
+### Git Commit Guidelines
 - NEVER commit or push changes without explicitly asking the user first.
 - Always ask "Should I commit these changes?" before running git commands.
 - Keep commit messages short (under 50 characters) and use imperative mood.
 - Use format: "Action: brief description" (e.g., "Fix: text processor error handling").
 - For multi-line commits, keep first line under 50 chars, add blank line, then details.
 
-Remember the following specifications and structural guidelines:
+### Code Quality
+- Avoid over‑commenting; docstrings only when intent is non‑obvious or business‑critical.
+- If you are reorganizing files in codebase, make sure to remove old files if corresponding new files(s) are created.
+
+
+## 2. PYTHON-SPECIFIC RULES
+
+### Language and Tooling
 - Use python 3.12 and above.
 - Always use type hints while generating code.
 - Manage dependencies with Poetry.
-- Place all tests under `tests/` mirroring package paths.
-- Provide a Makefile for multi‑step or hard‑to‑remember commands; avoid aliases for single‑word tools or commands.
-- You should use pydantic settings with ENV instead of using load_dotenv to load environment variables (this is creating a tight coupling between the modules and the settings file).
-- Keep README.md concise with high-level technical information for engineers. Ensure it reflects the current state of the codebase without change history.
-- Avoid over‑commenting; docstrings only when intent is non‑obvious or business‑critical.
-- If you are reogranizing files in codebase, make sure to remove old files if corresponding new files(s) are created
 
-Instructions related to business logic modules:
+### Code Structure and Imports
+- Do not use optional imports with try-except blocks. All modules should be directly imported.
+- If a feature is incomplete, use stub implementations with TODO comments rather than conditional imports.
+- At any given time, the source code should not have conditional imports or optional feature flags based on import availability.
+
+### Configuration Management
+- Use pydantic settings with ENV instead of using load_dotenv to load environment variables (this is creating a tight coupling between the modules and the settings file).
+
+### Business Logic Architecture
 - Business‑logic modules must be testable; dependencies should be injectable or mockable via dependency‑injection patterns.
 - Separate the data‑access layer from business logic. A (business) logic module should compose (instead of inherit) data‑access modules and other business‑logic modules.
-- Create Pydantic data models in separate files and organize them alongside their corresponding business logic. When models are shared between business logic and data access layers, use a single definition to avoid duplication.
+- Create Pydantic data models in separate files and organize them alongside their corresponding business logic.
+- When models are shared between business logic and data access layers, use a single definition to avoid duplication.
 - For codes that can be reused, create stateless utility functions that are independent of self-hosted infrastructure and don't modify system state.
 
-Code import and structure rules:
-- Do not use optional imports with try-except blocks. All modules should be directly imported. If a feature is incomplete, use stub implementations with TODO comments rather than conditional imports.
-- At any given time, the source code should not have conditional imports or optional feature flags based on import availability.
+
+## 3. FASTAPI-SPECIFIC RULES (placeholder for future FastAPI-specific guidelines)
+
+### API Design
+- [TODO: Add FastAPI-specific API design guidelines]
+
+### Dependency Injection
+- [TODO: Add FastAPI dependency injection patterns]
+
+### Error Handling
+- [TODO: Add FastAPI error handling standards]
+
+
+## 4. PROJECT-SPECIFIC RULES
+
+### Testing Organization
+- Place all tests under `tests/` mirroring package paths.
+
+### Build and Automation
+- Provide a Makefile for multi‑step or hard‑to‑remember commands; avoid aliases for single‑word tools or commands.
+
+### Documentation
+- Keep README.md concise with high-level technical information for engineers.
+- Ensure it reflects the current state of the codebase without change history.
