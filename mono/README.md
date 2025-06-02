@@ -14,6 +14,31 @@ Text processing system with LangChain-based decision making and web interface.
 - SQLAlchemy-based persistence layer
 - RESTful API and web interface
 - Web interface with decision chain visualization
+- **MCP Server**: Model Context Protocol server for AI tool integration
+
+## MCP Server
+
+The MCP (Model Context Protocol) server provides standardized tool access for AI applications:
+
+**Available Tools:**
+- `calculate`: Safe mathematical expression evaluator
+- `text_stats`: Text analysis (word count, character count, etc.)
+- `system_info`: Basic system information
+- `format_text`: Text formatting (upper, lower, title, etc.)
+
+**Usage:**
+```bash
+make mcp-help     # Show MCP commands
+make mcp-server   # Run server (stdio mode)
+make mcp-client   # Run interactive client
+```
+
+**Integration Example:**
+```python
+from src.mcp_server import SimpleMCPServer
+server = SimpleMCPServer()
+server.run_stdio()
+```
 
 ## Setup
 
