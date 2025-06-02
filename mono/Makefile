@@ -1,4 +1,4 @@
-.PHONY: setup check clean help lint format type-check install test serve serve-dev build-ui build-ui-dev build-css build-css-dev
+.PHONY: setup check clean help lint format type-check install test serve serve-dev build-ui build-ui-dev build-css build-css-dev mcp-server mcp-client mcp-help
 
 # Variables
 PYTHON = python3
@@ -7,6 +7,8 @@ TEST_DIR = tests
 PORT ?= 5000
 HOST ?= 0.0.0.0
 TIMEOUT ?= 300
+MCP_PORT ?= 8000
+MCP_HOST ?= localhost
 
 help:
 	@echo "Available commands:"
@@ -26,6 +28,9 @@ help:
 	@echo "  make build-ui-dev - Build UI components (development mode with watch)"
 	@echo "  make build-css   - Build Tailwind CSS (production mode)"
 	@echo "  make build-css-dev - Build Tailwind CSS (development mode with watch)"
+	@echo "  make mcp-server  - Run the MCP server in stdio mode"
+	@echo "  make mcp-client  - Run the MCP client (interactive)"
+	@echo "  make mcp-help    - Show MCP-specific help"
 
 # Setup the development environment
 setup: install
@@ -132,6 +137,34 @@ build-css:
 build-css-dev:
 	@echo "Building Tailwind CSS (development mode)..."
 	@cd src/server/static && npm install && npm run dev:css
+
+# MCP Server and Client commands
+mcp-help:
+	@echo "MCP (Model Context Protocol) Commands:"
+	@echo "  make mcp-server  - Run the MCP server in stdio mode"
+	@echo "  make mcp-client  - Run the MCP client (interactive)"
+	@echo ""
+	@echo "Available MCP tools:"
+	@echo "  - calculate: Safe mathematical expression evaluator"
+	@echo "  - text_stats: Text analysis (word count, character count, etc.)"
+	@echo "  - system_info: Basic system information"
+	@echo "  - format_text: Text formatting (upper, lower, title, etc.)"
+	@echo ""
+	@echo "Example usage:"
+	@echo "  Terminal 1: make mcp-server"
+	@echo "  Terminal 2: make mcp-client"
+
+# Run MCP Server in stdio mode (for MCP protocol communication)
+mcp-server: install
+	@echo "Starting MCP Server in stdio mode..."
+	@echo "Use Ctrl+C to stop the server"
+	@poetry run python -m src.mcp_server.server
+
+# Run MCP Client (interactive session)
+mcp-client: install
+	@echo "Starting MCP Client..."
+	@echo "Make sure the MCP server is running in another terminal"
+	@poetry run python -m src.mcp_server.client
 
 # Clean up
 clean:

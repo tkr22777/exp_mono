@@ -27,6 +27,7 @@ flask-restful = "^0.3.10"  # RESTful API extension for Flask
 flask-cors = "^4.0.0"  # Cross-Origin Resource Sharing
 gunicorn = "^21.2.0"  # WSGI HTTP Server for production deployment
 flask-socketio = "^5.3.3"  # Flask-SocketIO for WebSocket support
+mcp = "^1.0.0"  # Model Context Protocol SDK
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"
