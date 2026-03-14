@@ -41,7 +41,6 @@ def get_gmail_service():
 
 
 def extract_body(payload: dict) -> str:
-    """Extract plain text body from a Gmail message payload."""
     if payload.get("body", {}).get("data"):
         return base64.urlsafe_b64decode(payload["body"]["data"]).decode("utf-8", errors="replace")
 
@@ -53,7 +52,6 @@ def extract_body(payload: dict) -> str:
 
 
 def fetch_page(service, page_size: int, cursor: str | None) -> tuple[list[dict], str | None]:
-    """Fetch one page of emails. Returns (emails, next_cursor)."""
     kwargs = {"userId": "me", "maxResults": page_size}
     if cursor:
         kwargs["pageToken"] = cursor
@@ -102,16 +100,17 @@ def print_email(email: dict, analyze: bool) -> None:
     click.echo("")
 
 
-@click.command()
+@click.group()
+def main() -> None:
+    """Gmail CLI — browse and analyse your inbox."""
+
+
+@main.command()
 @click.option("--page-size", default=10, show_default=True, help="Emails per page.")
 @click.option("--cursor", default=None, help="Page token from a previous run to continue from.")
 @click.option("--analyze", is_flag=True, default=False, help="Analyze each email with Gemini.")
-def main(page_size: int, cursor: str | None, analyze: bool) -> None:
-    """Crawl Gmail and print one page of email metadata.
-
-    Pass --cursor <token> to fetch the next page. Use --analyze to get
-    a Gemini verdict (IMPORTANT / NEUTRAL / SPAM) for each email.
-    """
+def browse(page_size: int, cursor: str | None, analyze: bool) -> None:
+    """Browse a page of emails. Use --cursor to paginate."""
     service = get_gmail_service()
     emails, next_cursor = fetch_page(service, page_size, cursor)
 
@@ -123,3 +122,17 @@ def main(page_size: int, cursor: str | None, analyze: bool) -> None:
         click.echo(f"Next cursor: {next_cursor}")
     else:
         click.echo("No more pages.")
+
+
+@main.command()
+def count() -> None:
+    """Print the total and unread email counts for the inbox."""
+    service = get_gmail_service()
+    label = service.users().labels().get(userId="me", id="INBOX").execute()
+
+    total = label.get("messagesTotal", 0)
+    unread = label.get("messagesUnread", 0)
+
+    click.echo(f"Inbox total : {total}")
+    click.echo(f"Unread      : {unread}")
+    click.echo(f"Read        : {total - unread}")
