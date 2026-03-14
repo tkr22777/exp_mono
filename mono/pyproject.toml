@@ -6,6 +6,7 @@ authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
 packages = [
     {include = "src"},
+    {include = "scripts"},
 ]
 
 [tool.poetry.dependencies]
@@ -17,6 +18,9 @@ openai = "^1.4.0"
 python-dotenv = "^1.0.0"
 tenacity = "^8.2.2"  # Retry library for API calls
 google-generativeai = "0.3.2"  # Google's Gemini API with fixed version
+google-api-python-client = "^2.100.0"  # Google API client for Gmail
+google-auth-httplib2 = "^0.2.0"  # HTTP transport for Google Auth
+google-auth-oauthlib = "^1.1.0"  # OAuth2 flow for Google APIs
 langchain = ">=0.0.267"
 langchain-openai = ">=0.0.2"
 langchain-community = ">=0.0.9"
@@ -36,6 +40,10 @@ isort = "^5.12.0"
 mypy = "^1.6.1"
 pytest = "^7.4.3"
 types-flask-cors = "^5.0.0.20250413"
+
+[tool.poetry.scripts]
+hello = "scripts.hello:main"
+gmail-crawler = "scripts.gmail_crawler:main"
 
 [build-system]
 requires = ["poetry-core"]

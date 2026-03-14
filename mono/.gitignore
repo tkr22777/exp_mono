@@ -39,6 +39,10 @@ htmlcov/
 .env
 # Only add other environment files here if needed in the future
 
+# Gmail API credentials (never commit these)
+credentials/credentials.json
+credentials/token.json
+
 # Node.js
 node_modules/
 npm-debug.log
