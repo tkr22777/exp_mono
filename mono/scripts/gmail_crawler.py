@@ -1,4 +1,5 @@
 import base64
+import logging
 import os
 
 import click
@@ -11,6 +12,13 @@ from sqlalchemy.orm import Session
 
 from src.modules.email_analyzer.analyzer import analyze_email
 from src.modules.email_store import repository as repo
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
@@ -140,11 +148,11 @@ def sync(db_path: str, pages: int, fresh: bool) -> None:
         saved_cursor = None if fresh else repo.get_cursor(session)
 
     if saved_cursor:
-        click.echo(f"Resuming previous sync from saved cursor.")
+        logger.info("Resuming previous sync from saved cursor.")
     else:
-        click.echo(f"Starting fresh sync.")
+        logger.info("Starting fresh sync.")
 
-    click.echo(f"Syncing to {db_path} ...\n")
+    logger.info(f"Syncing to {db_path} ...")
 
     cursor = saved_cursor
     page_count = 0
@@ -160,7 +168,7 @@ def sync(db_path: str, pages: int, fresh: bool) -> None:
 
         page_count += 1
         total_inserted += inserted
-        click.echo(f"  Page {page_count}: {inserted} new of {len(emails)} (total inserted: {total_inserted})")
+        logger.info(f"Page {page_count}: {inserted} new of {len(emails)} fetched (running total: {total_inserted})")
 
         cursor = next_cursor
         if not cursor or (pages and page_count >= pages):
@@ -169,7 +177,7 @@ def sync(db_path: str, pages: int, fresh: bool) -> None:
     with Session(engine) as session:
         db_total = repo.total_count(session)
 
-    click.echo(f"\nDone. {total_inserted} new email(s) added. Total in DB: {db_total}.")
+    logger.info(f"Sync complete. {total_inserted} new email(s) added. Total in DB: {db_total}.")
 
 
 @main.command()
