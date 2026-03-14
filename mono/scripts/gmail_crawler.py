@@ -20,7 +20,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = ["https://mail.google.com/"]
 
 CREDENTIALS_DIR = os.path.join(os.path.dirname(__file__), "..", "credentials")
 CREDENTIALS_FILE = os.path.join(CREDENTIALS_DIR, "credentials.json")
@@ -178,6 +178,54 @@ def sync(db_path: str, pages: int, fresh: bool) -> None:
         db_total = repo.total_count(session)
 
     logger.info(f"Sync complete. {total_inserted} new email(s) added. Total in DB: {db_total}.")
+
+
+def fetch_all_ids_from_gmail(service, query: str) -> list[str]:
+    """Fetch all message IDs from Gmail matching a search query."""
+    ids = []
+    cursor = None
+    while True:
+        kwargs = {"userId": "me", "q": query, "maxResults": 500}
+        if cursor:
+            kwargs["pageToken"] = cursor
+        result = service.users().messages().list(**kwargs).execute()
+        ids.extend(m["id"] for m in result.get("messages", []))
+        cursor = result.get("nextPageToken")
+        if not cursor:
+            break
+    return ids
+
+
+@main.command("delete-sender")
+@click.argument("pattern")
+@click.option("--db-path", default="data/gmail.db", show_default=True, help="SQLite DB path.")
+def delete_sender(pattern: str, db_path: str) -> None:
+    """Permanently delete all emails from Gmail and DB matching PATTERN (e.g. 'robinhood')."""
+    service = get_gmail_service()
+
+    logger.info(f"Searching Gmail for emails from '{pattern}'...")
+    ids = fetch_all_ids_from_gmail(service, query=f"from:{pattern}")
+
+    if not ids:
+        click.echo(f"No emails found in Gmail matching '{pattern}'.")
+        return
+
+    click.echo(f"Found {len(ids)} email(s) in Gmail matching '{pattern}'.")
+    click.confirm("Permanently delete from Gmail and local DB?", abort=True)
+
+    deleted = 0
+    for email_id in ids:
+        service.users().messages().delete(userId="me", id=email_id).execute()
+        deleted += 1
+        if deleted % 50 == 0:
+            logger.info(f"Deleted {deleted}/{len(ids)} from Gmail...")
+
+    engine = repo.get_engine(db_path)
+    with Session(engine) as session:
+        repo.delete_by_ids(session, ids)
+        session.commit()
+
+    logger.info(f"Done. {deleted} email(s) permanently deleted from Gmail and DB.")
 
 
 @main.command()

@@ -42,5 +42,15 @@ def save_cursor(session: Session, cursor: str | None) -> None:
     session.merge(SyncState(id=SYNC_STATE_ID, cursor=cursor))
 
 
+def get_ids_by_sender(session: Session, pattern: str) -> list[str]:
+    return list(session.scalars(
+        select(Email.id).where(Email.sender.ilike(f"%{pattern}%"))
+    ))
+
+
+def delete_by_ids(session: Session, ids: list[str]) -> None:
+    session.query(Email).where(Email.id.in_(ids)).delete(synchronize_session=False)
+
+
 def total_count(session: Session) -> int:
     return session.scalar(select(func.count()).select_from(Email))
