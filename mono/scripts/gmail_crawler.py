@@ -7,7 +7,10 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
+from sqlalchemy.orm import Session
+
 from src.modules.email_analyzer.analyzer import analyze_email
+from src.modules.email_store import repository as repo
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
@@ -122,6 +125,41 @@ def browse(page_size: int, cursor: str | None, analyze: bool) -> None:
         click.echo(f"Next cursor: {next_cursor}")
     else:
         click.echo("No more pages.")
+
+
+@main.command()
+@click.option("--db-path", default="data/gmail.db", show_default=True, help="SQLite DB path.")
+@click.option("--pages", default=0, show_default=True, help="Number of pages to fetch (0 = all).")
+def sync(db_path: str, pages: int) -> None:
+    """Pull inbox emails into a local SQLite DB. Existing records are replaced."""
+    service = get_gmail_service()
+    engine = repo.get_engine(db_path)
+
+    cursor = None
+    page_count = 0
+    total_saved = 0
+
+    click.echo(f"Syncing to {db_path} ...")
+
+    while True:
+        emails, cursor = fetch_page(service, page_size=50, cursor=cursor)
+
+        with Session(engine) as session:
+            for email in emails:
+                repo.save(session, email)
+            session.commit()
+
+        page_count += 1
+        total_saved += len(emails)
+        click.echo(f"  Page {page_count}: saved {len(emails)} emails (total: {total_saved})")
+
+        if not cursor or (pages and page_count >= pages):
+            break
+
+    with Session(engine) as session:
+        db_total = repo.total_count(session)
+
+    click.echo(f"\nDone. {total_saved} email(s) synced. Total in DB: {db_total}.")
 
 
 @main.command()

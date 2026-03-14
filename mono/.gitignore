@@ -43,6 +43,9 @@ htmlcov/
 credentials/credentials.json
 credentials/token.json
 
+# Local data
+data/*.db
+
 # Node.js
 node_modules/
 npm-debug.log
