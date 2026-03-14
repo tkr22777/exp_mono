@@ -3,7 +3,8 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()           # .env
+load_dotenv(".env.local", override=True)  # .env.local overrides
 
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "models/gemini-1.5-flash-001")
 
