@@ -97,8 +97,6 @@ def main(page_size: int, cursor: str | None) -> None:
         print_email(email)
 
     if next_cursor:
-        click.echo(f"Next page cursor:\n  {next_cursor}")
-        click.echo("\nRun with --cursor to fetch the next page:")
-        click.echo(f"  poetry run gmail-crawler --cursor {next_cursor}")
+        click.echo(f"Next cursor: {next_cursor}")
     else:
         click.echo("No more pages.")
