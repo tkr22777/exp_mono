@@ -43,8 +43,7 @@ htmlcov/
 credentials/credentials.json
 credentials/token.json
 
-# Local data
-data/*.db
+# Local data (db files are tracked intentionally for backup)
 
 # Node.js
 node_modules/

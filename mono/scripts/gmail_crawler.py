@@ -159,7 +159,7 @@ def sync(db_path: str, pages: int, fresh: bool) -> None:
     total_inserted = 0
 
     while True:
-        emails, next_cursor = fetch_page(service, page_size=50, cursor=cursor)
+        emails, next_cursor = fetch_page(service, page_size=500, cursor=cursor)
 
         with Session(engine) as session:
             inserted = repo.insert_new(session, emails)

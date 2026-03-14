@@ -1,15 +1,33 @@
-from sqlalchemy import create_engine, func, select
+from sqlalchemy import create_engine, func, inspect, select, text
 from sqlalchemy.orm import Session
 
 from src.modules.email_store.models import Base, Email, SyncState
 
 SYNC_STATE_ID = "default"
 
+# List of migrations to apply in order. Each is a raw SQL ALTER statement
+# that is safe to skip if the column already exists.
+_MIGRATIONS = [
+    "ALTER TABLE emails ADD COLUMN deleted BOOLEAN NOT NULL DEFAULT 0",
+]
+
 
 def get_engine(db_path: str):
     engine = create_engine(f"sqlite:///{db_path}")
     Base.metadata.create_all(engine)
+    _run_migrations(engine)
     return engine
+
+
+def _run_migrations(engine) -> None:
+    existing_columns = {col["name"] for col in inspect(engine).get_columns("emails")}
+    with engine.connect() as conn:
+        for statement in _MIGRATIONS:
+            # Derive column name from the ALTER statement to check if it exists
+            col_name = statement.split("ADD COLUMN")[1].strip().split()[0]
+            if col_name not in existing_columns:
+                conn.execute(text(statement))
+                conn.commit()
 
 
 def insert_new(session: Session, emails: list[dict]) -> int:
