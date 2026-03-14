@@ -15,6 +15,7 @@ class Email(Base):
     date = Column(Text)
     unread = Column(Boolean)
     body = Column(Text)
+    deleted = Column(Boolean, default=False, nullable=False, server_default="0")
 
 
 class SyncState(Base):

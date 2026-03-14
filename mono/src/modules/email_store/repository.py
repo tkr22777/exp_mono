@@ -48,8 +48,10 @@ def get_ids_by_sender(session: Session, pattern: str) -> list[str]:
     ))
 
 
-def delete_by_ids(session: Session, ids: list[str]) -> None:
-    session.query(Email).where(Email.id.in_(ids)).delete(synchronize_session=False)
+def mark_deleted(session: Session, ids: list[str]) -> None:
+    session.query(Email).where(Email.id.in_(ids)).update(
+        {Email.deleted: True}, synchronize_session=False
+    )
 
 
 def total_count(session: Session) -> int:

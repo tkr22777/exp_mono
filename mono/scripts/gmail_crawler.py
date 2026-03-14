@@ -222,10 +222,10 @@ def delete_sender(pattern: str, db_path: str) -> None:
 
     engine = repo.get_engine(db_path)
     with Session(engine) as session:
-        repo.delete_by_ids(session, ids)
+        repo.mark_deleted(session, ids)
         session.commit()
 
-    logger.info(f"Done. {deleted} email(s) permanently deleted from Gmail and DB.")
+    logger.info(f"Done. {deleted} email(s) permanently deleted from Gmail and marked deleted in DB.")
 
 
 @main.command()
