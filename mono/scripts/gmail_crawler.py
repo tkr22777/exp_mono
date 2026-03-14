@@ -130,36 +130,46 @@ def browse(page_size: int, cursor: str | None, analyze: bool) -> None:
 @main.command()
 @click.option("--db-path", default="data/gmail.db", show_default=True, help="SQLite DB path.")
 @click.option("--pages", default=0, show_default=True, help="Number of pages to fetch (0 = all).")
-def sync(db_path: str, pages: int) -> None:
-    """Pull inbox emails into a local SQLite DB. Existing records are replaced."""
+@click.option("--fresh", is_flag=True, default=False, help="Ignore saved cursor and start from the beginning.")
+def sync(db_path: str, pages: int, fresh: bool) -> None:
+    """Pull inbox emails into SQLite. Skips existing emails. Resumes automatically if interrupted."""
     service = get_gmail_service()
     engine = repo.get_engine(db_path)
 
-    cursor = None
-    page_count = 0
-    total_saved = 0
+    with Session(engine) as session:
+        saved_cursor = None if fresh else repo.get_cursor(session)
 
-    click.echo(f"Syncing to {db_path} ...")
+    if saved_cursor:
+        click.echo(f"Resuming previous sync from saved cursor.")
+    else:
+        click.echo(f"Starting fresh sync.")
+
+    click.echo(f"Syncing to {db_path} ...\n")
+
+    cursor = saved_cursor
+    page_count = 0
+    total_inserted = 0
 
     while True:
-        emails, cursor = fetch_page(service, page_size=50, cursor=cursor)
+        emails, next_cursor = fetch_page(service, page_size=50, cursor=cursor)
 
         with Session(engine) as session:
-            for email in emails:
-                repo.save(session, email)
+            inserted = repo.insert_new(session, emails)
+            repo.save_cursor(session, next_cursor)
             session.commit()
 
         page_count += 1
-        total_saved += len(emails)
-        click.echo(f"  Page {page_count}: saved {len(emails)} emails (total: {total_saved})")
+        total_inserted += inserted
+        click.echo(f"  Page {page_count}: {inserted} new of {len(emails)} (total inserted: {total_inserted})")
 
+        cursor = next_cursor
         if not cursor or (pages and page_count >= pages):
             break
 
     with Session(engine) as session:
         db_total = repo.total_count(session)
 
-    click.echo(f"\nDone. {total_saved} email(s) synced. Total in DB: {db_total}.")
+    click.echo(f"\nDone. {total_inserted} new email(s) added. Total in DB: {db_total}.")
 
 
 @main.command()
