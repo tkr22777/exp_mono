@@ -1,5 +1,5 @@
 from src.modules.llms.gemini_client import GeminiClient
-from scripts.prompts import EMAIL_IMPORTANCE_PROMPT
+from src.modules.email_analyzer.prompts import EMAIL_IMPORTANCE_PROMPT
 
 MAX_BODY_CHARS = 1000
 

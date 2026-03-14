@@ -7,7 +7,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-from scripts.email_analyzer import analyze_email
+from src.modules.email_analyzer.analyzer import analyze_email
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
