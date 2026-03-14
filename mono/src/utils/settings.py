@@ -36,7 +36,7 @@ class Settings(BaseSettings):
         None, description="Google Gemini API key (optional)"
     )
     GEMINI_MODEL: str = Field(
-        "models/gemini-1.5-flash-001", description="Google Gemini model name"
+        "models/gemini-2.5-flash", description="Google Gemini model name"
     )
     GEMINI_TEMPERATURE: float = Field(
         0.15, description="Temperature for Gemini response generation"

@@ -1,12 +1,12 @@
 import os
 
-import google.generativeai as genai
 from dotenv import load_dotenv
+from google import genai
 
-load_dotenv()           # .env
-load_dotenv(".env.local", override=True)  # .env.local overrides
+load_dotenv()
+load_dotenv(".env.local", override=True)
 
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "models/gemini-1.5-flash-001")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "models/gemini-2.5-flash")
 
 
 class GeminiClient:
@@ -14,11 +14,13 @@ class GeminiClient:
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             raise EnvironmentError(
-                "GEMINI_API_KEY not set. Add it to your .env file."
+                "GEMINI_API_KEY not set. Add it to your .env.local file."
             )
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(GEMINI_MODEL)
+        self.client = genai.Client(api_key=api_key)
 
     def ask(self, prompt: str) -> str:
-        response = self.model.generate_content(prompt)
+        response = self.client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+        )
         return response.text

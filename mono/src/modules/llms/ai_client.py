@@ -6,7 +6,7 @@ This module provides functionality to interact with external AI language models.
 import logging
 from typing import Dict, List, Optional, Union
 
-import google.generativeai as genai
+from google import genai
 from openai import OpenAI
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
@@ -15,9 +15,6 @@ from src.utils.settings import settings
 # Configure logger for this module
 logger = logging.getLogger(__name__)
 
-# Initialize Gemini if API key is available
-if settings.GEMINI_API_KEY:
-    genai.configure(api_key=settings.GEMINI_API_KEY)
 
 # Define Message type for clarity
 Message = Dict[str, str]  # Contains 'role' and 'content' keys
@@ -163,25 +160,11 @@ class AIClient:
             )
 
         try:
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-
-            model = genai.GenerativeModel(settings.GEMINI_MODEL)
-
-            # Handle different versions of the Gemini API for generation config
-            try:
-                generation_config = genai.types.GenerationConfig(
-                    temperature=settings.GEMINI_TEMPERATURE,
-                    max_output_tokens=250,
-                )
-            except TypeError:
-                generation_config = genai.types.GenerationConfig(
-                    temperature=settings.GEMINI_TEMPERATURE,
-                )
-
-            response = model.generate_content(
-                input_data, generation_config=generation_config
+            client = genai.Client(api_key=settings.GEMINI_API_KEY)
+            response = client.models.generate_content(
+                model=settings.GEMINI_MODEL,
+                contents=input_data,
             )
-
             return response.text
         except Exception as e:
             logger.error(f"Error generating Gemini response: {str(e)}", exc_info=True)
