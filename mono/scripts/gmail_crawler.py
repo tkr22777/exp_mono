@@ -200,47 +200,32 @@ def sync(db_path: str, pages: int, fresh: bool) -> None:
     logger.info(f"Sync complete. {total_inserted} new email(s) added. Total in DB: {db_total}.")
 
 
-def fetch_all_ids_from_gmail(service, query: str) -> list[str]:
-    """Fetch all message IDs from Gmail matching a search query."""
-    ids = []
-    cursor = None
-    while True:
-        kwargs = {"userId": "me", "q": query, "maxResults": 500}
-        if cursor:
-            kwargs["pageToken"] = cursor
-        result = service.users().messages().list(**kwargs).execute()
-        ids.extend(m["id"] for m in result.get("messages", []))
-        cursor = result.get("nextPageToken")
-        if not cursor:
-            break
-    return ids
-
-
 @main.command("delete-sender")
 @click.argument("pattern")
 @click.option("--db-path", default="data/gmail.db", show_default=True, help="SQLite DB path.")
 def delete_sender(pattern: str, db_path: str) -> None:
-    """Permanently delete all emails from Gmail and DB matching PATTERN (e.g. 'robinhood')."""
-    service = get_gmail_service()
+    """Permanently delete emails from Gmail using IDs looked up from the local DB."""
+    engine = repo.get_engine(db_path)
 
-    logger.info(f"Searching Gmail for emails from '{pattern}'...")
-    ids = fetch_all_ids_from_gmail(service, query=f"from:{pattern}")
+    with Session(engine) as session:
+        ids = repo.get_ids_by_sender(session, pattern)
 
     if not ids:
-        click.echo(f"No emails found in Gmail matching '{pattern}'.")
+        click.echo(f"No emails found in DB matching '{pattern}'.")
         return
 
-    click.echo(f"Found {len(ids)} email(s) in Gmail matching '{pattern}'.")
-    click.confirm("Permanently delete from Gmail and local DB?", abort=True)
+    click.echo(f"Found {len(ids)} email(s) in DB matching '{pattern}'.")
+    click.confirm("Permanently delete from Gmail and mark deleted in DB?", abort=True)
 
+    service = get_gmail_service()
     deleted = 0
+
     for email_id in ids:
         service.users().messages().delete(userId="me", id=email_id).execute()
         deleted += 1
         if deleted % 50 == 0:
             logger.info(f"Deleted {deleted}/{len(ids)} from Gmail...")
 
-    engine = repo.get_engine(db_path)
     with Session(engine) as session:
         repo.mark_deleted(session, ids)
         session.commit()

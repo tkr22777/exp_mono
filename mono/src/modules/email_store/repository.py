@@ -62,7 +62,10 @@ def save_cursor(session: Session, cursor: str | None) -> None:
 
 def get_ids_by_sender(session: Session, pattern: str) -> list[str]:
     return list(session.scalars(
-        select(Email.id).where(Email.sender.ilike(f"%{pattern}%"))
+        select(Email.id).where(
+            Email.sender.ilike(f"%{pattern}%"),
+            Email.deleted == False,  # noqa: E712
+        )
     ))
 
 
