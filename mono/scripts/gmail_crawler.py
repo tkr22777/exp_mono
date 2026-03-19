@@ -7,6 +7,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 from sqlalchemy.orm import Session
 
@@ -62,6 +64,26 @@ def extract_body(payload: dict) -> str:
     return "(no body)"
 
 
+def _is_transient(exc: BaseException) -> bool:
+    return isinstance(exc, HttpError) and exc.status_code >= 500
+
+
+@retry(
+    retry=retry_if_exception(_is_transient),
+    wait=wait_exponential(multiplier=1, min=2, max=30),
+    stop=stop_after_attempt(5),
+    reraise=True,
+)
+def _fetch_message(service, message_id: str) -> dict:
+    return (
+        service.users()
+        .messages()
+        .get(userId="me", id=message_id, format="full",
+             metadataHeaders=["Subject", "From", "Date"])
+        .execute()
+    )
+
+
 def fetch_page(service, page_size: int, cursor: str | None) -> tuple[list[dict], str | None]:
     kwargs = {"userId": "me", "maxResults": page_size}
     if cursor:
@@ -73,13 +95,7 @@ def fetch_page(service, page_size: int, cursor: str | None) -> tuple[list[dict],
 
     emails = []
     for msg in messages:
-        detail = (
-            service.users()
-            .messages()
-            .get(userId="me", id=msg["id"], format="full",
-                 metadataHeaders=["Subject", "From", "Date"])
-            .execute()
-        )
+        detail = _fetch_message(service, msg["id"])
 
         headers = {h["name"]: h["value"] for h in detail["payload"]["headers"]}
         is_unread = "UNREAD" in detail.get("labelIds", [])
