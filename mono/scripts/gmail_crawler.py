@@ -2,6 +2,8 @@ import base64
 import logging
 import os
 
+import sys
+
 import click
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -19,6 +21,8 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
+    stream=sys.stdout,
+    force=True,
 )
 logger = logging.getLogger(__name__)
 
@@ -175,7 +179,7 @@ def sync(db_path: str, pages: int, fresh: bool) -> None:
     total_inserted = 0
 
     while True:
-        emails, next_cursor = fetch_page(service, page_size=500, cursor=cursor)
+        emails, next_cursor = fetch_page(service, page_size=100, cursor=cursor)
 
         with Session(engine) as session:
             inserted = repo.insert_new(session, emails)
